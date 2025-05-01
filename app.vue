@@ -5,7 +5,7 @@
 </template>
 
 <style>
-body {
+/* body {
   @apply m-0 font-sans antialiased;
-}
+} */
 </style>
