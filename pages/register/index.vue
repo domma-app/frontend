@@ -91,7 +91,7 @@ const lastName = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
-const agreeToTerms = ref(CSSFontFeatureValuesRule);
+const agreeToTerms = ref(false);
 
 const handleRegister = async () => {
   // TODO: Implement registration logic
