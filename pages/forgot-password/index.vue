@@ -47,7 +47,7 @@ const handleForgotPassword = async () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Redirect to check-email page
-    navigateTo("/check-email");
+    navigateTo("/forgot-password/check-email");
   } catch (error) {
     console.error("Error:", error);
   } finally {
