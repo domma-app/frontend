@@ -5,5 +5,5 @@
 [functions]
   directory = ".output/server"
 
-[build.environment]
-  NITRO_PRESET = "netlify"
+# [build.environment]
+#   NITRO_PRESET = "netlify"
