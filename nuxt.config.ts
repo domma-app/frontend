@@ -8,5 +8,6 @@ export default defineNuxtConfig({
   },
   app: {
     baseURL: '/frontend/',
-  }
+  },
+  inlineSSRStyles: false,
 });
