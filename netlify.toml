@@ -1,10 +1,10 @@
-[build]
-  command = "npm run generate"
-  publish = ".dist"
+# [build]
+#   command = "npm run generate"
+#   publish = ".dist"
 
-# [functions]
-  # directory = ".output/server"
+# # [functions]
+#   # directory = ".output/server"
 
-# [build.environment]
-#   NITRO_PRESET = "netlify"
-  # NODE_VERSION = "18"
+# # [build.environment]
+# #   NITRO_PRESET = "netlify"
+#   # NODE_VERSION = "18"
