@@ -10,4 +10,7 @@ export default defineNuxtConfig({
     baseURL: '/frontend/',
   },
   inlineSSRStyles: false,
+  nitro: {
+    preset: 'netlify'
+  }
 });
