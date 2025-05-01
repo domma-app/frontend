@@ -6,4 +6,7 @@ export default defineNuxtConfig({
   tailwindcss: {
     // Options
   },
+  app: {
+    baseURL: '/frontend/',
+  }
 });
