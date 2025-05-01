@@ -6,9 +6,9 @@ export default defineNuxtConfig({
   tailwindcss: {
     // Options
   },
-  app: {
-    baseURL: '/frontend/',
-  },
+  // app: {
+  //   baseURL: '/frontend/',
+  // },
   inlineSSRStyles: false,
   nitro: {
     preset: 'netlify'
