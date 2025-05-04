@@ -13,25 +13,45 @@
         <div class="hidden md:flex items-center space-x-4">
           <NuxtLink
             to="/dashboard"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-green-500 transition-colors"
+            class="px-3 py-2 text-sm font-medium transition-colors"
+            :class="[
+              $route.path === '/dashboard'
+                ? 'text-green-500'
+                : 'text-gray-700 hover:text-green-500',
+            ]"
           >
             Dashboard
           </NuxtLink>
           <NuxtLink
             to="/transaction"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-green-500 transition-colors"
+            class="px-3 py-2 text-sm font-medium transition-colors"
+            :class="[
+              $route.path === '/transaction'
+                ? 'text-green-500'
+                : 'text-gray-700 hover:text-green-500',
+            ]"
           >
             Transaction
           </NuxtLink>
           <NuxtLink
             to="/budget"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-green-500 transition-colors"
+            class="px-3 py-2 text-sm font-medium transition-colors"
+            :class="[
+              $route.path === '/budget'
+                ? 'text-green-500'
+                : 'text-gray-700 hover:text-green-500',
+            ]"
           >
             Budget
           </NuxtLink>
           <NuxtLink
             to="/challenges"
-            class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-green-500 transition-colors"
+            class="px-3 py-2 text-sm font-medium transition-colors"
+            :class="[
+              $route.path === '/challenges'
+                ? 'text-green-500'
+                : 'text-gray-700 hover:text-green-500',
+            ]"
           >
             Challenges
           </NuxtLink>
@@ -39,7 +59,12 @@
           <!-- Profile link -->
           <NuxtLink
             to="/profile"
-            class="flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-green-500 transition-colors"
+            class="flex items-center px-3 py-2 text-sm font-medium transition-colors"
+            :class="[
+              $route.path === '/profile'
+                ? 'text-green-500'
+                : 'text-gray-700 hover:text-green-500',
+            ]"
           >
             <span>Profile</span>
             <svg
@@ -63,4 +88,6 @@
   </nav>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const $route = useRoute();
+</script>

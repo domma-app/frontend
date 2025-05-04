@@ -119,7 +119,7 @@
       </div>
       <div class="bg-white runded-lg shadow-sm p-4">
         <p class="text-sm text-gray-500 mb-1">Total Expenses</p>
-        <p class="text-2xl font-semibold text-red-500">+Rp1.250.000</p>
+        <p class="text-2xl font-semibold text-red-500">-Rp1.250.000</p>
       </div>
       <div class="bg-white runded-lg shadow-sm p-4">
         <p class="text-sm text-gray-500 mb-1">Balance</p>

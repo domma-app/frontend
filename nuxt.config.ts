@@ -9,8 +9,8 @@ export default defineNuxtConfig({
   // app: {
   //   baseURL: '/frontend/',
   // },
-  inlineSSRStyles: false,
+  // inlineSSRStyles: false,
   nitro: {
-    preset: 'netlify'
-  }
+    preset: "netlify",
+  },
 });
