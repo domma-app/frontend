@@ -214,6 +214,136 @@
           ></textarea>
         </div>
 
+        <!-- Recurring Transaction -->
+        <div class="mb-6">
+          <label class="flex items-center">
+            <input
+              type="checkbox"
+              v-model="transaction.isRecurring"
+              class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300 rounded"
+            />
+            <span class="ml-2 text-gray-700"
+              >This is a recurring transaction
+            </span>
+          </label>
+        </div>
+
+        <div
+          v-if="transaction.isRecurring"
+          class="mb-6 p-4 bg-gray-50 rounded-lg"
+        >
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Frequency
+          </label>
+          <div class="flex flex-wrap gap-3">
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="frequency"
+                value="daily"
+                v-model="transaction.recurring.frequency"
+                class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+              />
+              <span class="ml-2 text-gray-700">Daily</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="frequency"
+                value="weekly"
+                v-model="transaction.recurring.frequency"
+                class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+              />
+              <span class="ml-2 text-gray-700">Weekly</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="frequency"
+                value="monthly"
+                v-model="transaction.recurring.frequency"
+                class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+              />
+              <span class="ml-2 text-gray-700">Monthly</span>
+            </label>
+            <label class="flex items-center">
+              <input
+                type="radio"
+                name="frequency"
+                value="yearly"
+                v-model="transaction.recurring.frequency"
+                class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+              />
+              <span class="ml-2 text-gray-700">Yearly</span>
+            </label>
+          </div>
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2"
+              >End Date</label
+            >
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  name="end_type"
+                  value="never"
+                  v-model="transaction.recurring.endType"
+                  class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+                />
+                <span class="ml-2 text-gray-700">Never</span>
+              </label>
+
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  name="end_type"
+                  value="on_date"
+                  v-model="transaction.recurring.endType"
+                  class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+                />
+                <span class="ml-2 text-gray-700">On Date</span>
+              </label>
+
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  name="end_type"
+                  value="after_occurrences"
+                  v-model="transaction.recurring.endType"
+                  class="h-4 w-4 text-green-500 focus:ring-green-400 border-gray-300"
+                />
+                <span class="ml-2 text-gray-700">After Occurrences</span>
+              </label>
+            </div>
+
+            <div
+              class="mt-3"
+              v-if="transaction.recurring.endType === 'on_date'"
+            >
+              <input
+                type="date"
+                v-model="transaction.recurring.endDate"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+              />
+            </div>
+
+            <div
+              class="mt-3"
+              v-if="transaction.recurring.endType === 'after_occurrences'"
+            >
+              <div class="flex items-center">
+                <input
+                  type="number"
+                  min="1"
+                  v-model="transaction.recurring.occurrences"
+                  class="block w-24 rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
+                />
+                <span class="ml-2 text-gray-700">occurrences</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- Submit buttons -->
         <div class="flex justify-between">
           <NuxtLink
