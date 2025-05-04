@@ -356,7 +356,7 @@
           </NuxtLink>
 
           <NuxtLink
-            to="/reports"
+            to="#"
             class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <svg
@@ -398,7 +398,7 @@
           </NuxtLink>
 
           <NuxtLink
-            to="/financial-calendar"
+            to="#"
             class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <svg
