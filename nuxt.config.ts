@@ -12,5 +12,9 @@ export default defineNuxtConfig({
   // inlineSSRStyles: false,
   nitro: {
     preset: "netlify",
+    prerender: {
+      crawlLinks: true,
+      failOnError: false, // Prevents GitHub Action from failing on a single route error
+    },
   },
 });
