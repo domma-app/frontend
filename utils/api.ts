@@ -65,6 +65,19 @@ interface RegisterResponse {
   message: string;
 }
 
+interface LoginResponse {
+  access_token: string;
+  refresh_token: string;
+  user: {
+    id: string;
+    email: string;
+    full_name: string;
+    phone: string;
+    university: string;
+    major: string;
+  };
+}
+
 /**
  * User registration
  */
@@ -86,4 +99,23 @@ export async function registerUser(userData: {
   }
 
   return response.data as RegisterResponse;
+}
+
+/**
+ * User login
+ */
+export async function loginUser(credentials: {
+  email: string;
+  password: string;
+}): Promise<LoginResponse> {
+  const response = await apiRequest<LoginResponse>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(credentials),
+  });
+
+  if (response.error) {
+    throw new Error(response.error.message);
+  }
+
+  return response.data as LoginResponse;
 }

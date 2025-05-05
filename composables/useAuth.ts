@@ -82,6 +82,12 @@ export function useAuth() {
     return response;
   };
 
+  // Login user
+  const login = async (userData: { email: string; password: string }) => {
+    const response = await loginUser(userData);
+    return response;
+  };
+
   // Logout user
   const logout = () => {
     clearAuth();
@@ -91,6 +97,7 @@ export function useAuth() {
   return {
     authState: readonly(authState),
     register,
+    login,
     logout,
     isAuthenticated: computed(() => authState.value.isAuthenticated),
     user: computed(() => authState.value.user),
