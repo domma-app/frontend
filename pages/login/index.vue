@@ -81,7 +81,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'landing'
+  layout: "landing",
 });
 
 const email = ref("");
@@ -101,7 +101,7 @@ const toastTimeout = ref<number | null>(null);
 
 // Get redirect path from query params if it exists
 const redirectPath = computed(() => {
-  return (route.query.redirect as string) || '/dashboard';
+  return (route.query.redirect as string) || "/dashboard";
 });
 
 // Show success toast notification
@@ -110,11 +110,11 @@ const showSuccessToast = (message: string) => {
   if (toastTimeout.value) {
     clearTimeout(toastTimeout.value);
   }
-  
+
   // Set toast content
   toastMessage.value = message;
   showToast.value = true;
-  
+
   // Auto dismiss after 5 seconds
   toastTimeout.value = window.setTimeout(() => {
     dismissToast();
@@ -131,13 +131,9 @@ const dismissToast = () => {
 };
 
 const handleLogin = async () => {
-  const config = useRuntimeConfig();
-  const baseUrl = config.public.apiBaseUrl as string;
-  console.log(baseUrl);
-  
   // Reset error
   error.value = "";
-  
+
   // Validate form
   if (!email.value || !password.value) {
     error.value = "All fields are required";
@@ -152,20 +148,24 @@ const handleLogin = async () => {
   try {
     isLoading.value = true;
 
-    // Call register from auth composable
-    await login({
+    // Call login from auth composable with rememberMe option
+    const response = await login({
       email: email.value,
       password: password.value,
+      rememberMe: rememberMe.value,
     });
 
-    // Show success toast
-    showSuccessToast("Login successful!");
-    
+    // Show success toast with appropriate message
+    const sessionDuration = rememberMe.value
+      ? "You'll stay logged in for 30 days on this device"
+      : "You'll stay logged in until you close your browser";
+
+    showSuccessToast(`Login successful! ${sessionDuration}`);
+
     // Redirect to dashboard or the intended destination after a short delay
     setTimeout(() => {
       router.push(redirectPath.value);
-    }, 1500);
-    
+    }, 1000);
   } catch (err: any) {
     error.value = err.message || "Login failed. Please try again.";
   } finally {

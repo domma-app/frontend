@@ -5,8 +5,33 @@ export default defineNuxtPlugin(() => {
   const addAuthHeaders = (request: Request) => {
     // Only run on the client side
     if (process.client) {
-      const token = localStorage.getItem("auth_token");
+      // Check localStorage first, then sessionStorage
+      let token = localStorage.getItem("auth_access_token");
+      if (!token) {
+        token = sessionStorage.getItem("auth_access_token");
+      }
+
       if (token) {
+        // Check if token has expired
+        const expiry =
+          localStorage.getItem("auth_token_expiry") ||
+          sessionStorage.getItem("auth_token_expiry");
+        if (expiry && parseInt(expiry) < Date.now()) {
+          // Token expired, clear it
+          const { logout } = useAuth();
+          logout();
+
+          // Redirect to login if not already there
+          const route = useRoute();
+          if (!route.path.startsWith("/login")) {
+            const router = useRouter();
+            router.push(
+              `/login?redirect=${encodeURIComponent(route.fullPath)}`
+            );
+          }
+          return request;
+        }
+
         request.headers.set("Authorization", `Bearer ${token}`);
       }
     }

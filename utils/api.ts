@@ -66,15 +66,22 @@ interface RegisterResponse {
 }
 
 interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  user: {
-    id: string;
-    email: string;
-    full_name: string;
-    phone: string;
-    university: string;
-    major: string;
+  status: boolean;
+  message: string;
+  data: {
+    access_token: string;
+    refresh_token: string;
+    user: {
+      id: string;
+      email: string;
+      full_name: string;
+      phone: string;
+      university: string;
+      major: string;
+      created_at: string;
+      updated_at: string;
+      role: string;
+    };
   };
 }
 
@@ -107,10 +114,13 @@ export async function registerUser(userData: {
 export async function loginUser(credentials: {
   email: string;
   password: string;
+  rememberMe?: boolean;
 }): Promise<LoginResponse> {
+  const { email, password } = credentials;
+
   const response = await apiRequest<LoginResponse>("/auth/login", {
     method: "POST",
-    body: JSON.stringify(credentials),
+    body: JSON.stringify({ email, password }),
   });
 
   if (response.error) {

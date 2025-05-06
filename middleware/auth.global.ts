@@ -7,7 +7,7 @@ export default defineNuxtRouteMiddleware((to) => {
     "/login",
     "/register",
     "/forgot-password",
-    "/dashboard", // Temporary
+    // "/dashboard", // Temporary
   ];
 
   // If the route requires authentication and user is not authenticated, redirect to login
