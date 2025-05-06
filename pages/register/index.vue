@@ -1,7 +1,22 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+    <!-- Toast notification (only for success) -->
+    <Toast
+      :show="showToast"
+      :message="toastMessage"
+      :type="toastType"
+      @dismiss="dismissToast"
+    />
+
     <AuthCard title="Create an account" subtitle="Sign up to get started">
       <form @submit.prevent="handleRegister" class="w-full">
+        <div
+          v-if="error"
+          class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm"
+        >
+          {{ error }}
+        </div>
+
         <div class="grid grid-cols-2 gap-4">
           <AuthInput
             v-model="firstName"
@@ -64,12 +79,6 @@
             </span>
           </label>
         </div>
-        <div
-          v-if="error"
-          class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm"
-        >
-          {{ error }}
-        </div>
         <button
           type="submit"
           :disabled="!agreeToTerms || isLoading"
@@ -114,6 +123,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'landing'
+});
+
 const firstName = ref("");
 const lastName = ref("");
 const email = ref("");
@@ -124,6 +137,38 @@ const isLoading = ref(false);
 const error = ref("");
 const router = useRouter();
 const { register } = useAuth();
+
+// Toast state
+const showToast = ref(false);
+const toastMessage = ref("");
+const toastType = ref<"success">("success");
+const toastTimeout = ref<number | null>(null);
+
+// Show success toast notification
+const showSuccessToast = (message: string) => {
+  // Clear any existing timeout
+  if (toastTimeout.value) {
+    clearTimeout(toastTimeout.value);
+  }
+
+  // Set toast content
+  toastMessage.value = message;
+  showToast.value = true;
+
+  // Auto dismiss after 5 seconds
+  toastTimeout.value = window.setTimeout(() => {
+    dismissToast();
+  }, 5000);
+};
+
+// Dismiss toast notification
+const dismissToast = () => {
+  showToast.value = false;
+  if (toastTimeout.value) {
+    clearTimeout(toastTimeout.value);
+    toastTimeout.value = null;
+  }
+};
 
 const handleRegister = async () => {
   const config = useRuntimeConfig();
@@ -166,8 +211,13 @@ const handleRegister = async () => {
       password: password.value,
     });
 
-    // Redirect to login page after successful registration
-    router.push("/login");
+    // Show success toast
+    showSuccessToast("Registration successful!");
+
+    // Redirect to login page after a short delay
+    setTimeout(() => {
+      router.push("/login");
+    }, 1500);
   } catch (err: any) {
     error.value = err.message || "Registration failed. Please try again.";
   } finally {

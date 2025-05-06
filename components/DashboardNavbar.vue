@@ -49,6 +49,19 @@
                   : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
               ]"
             >
+              <!-- <svg
+                class="w-5 h-5 mr-1.5"
+                fill="none"
+                stroke="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 9l-7 7-3-3m0 0l.94-2.06L4.03 13.8l1.9-1.9 2.07-.93m10 6.87l-2.53-4.2-1.47.79 2.53 4.2M5 3l4 2m0 0L5 9m4-4l8 8"
+                ></path>
+              </svg> -->
               <svg
                 class="w-5 h-5 mr-1.5"
                 fill="none"
@@ -60,7 +73,7 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M17 9l-7 7-3-3m0 0l.94-2.06L4.03 13.8l1.9-1.9 2.07-.93m10 6.87l-2.53-4.2-1.47.79 2.53 4.2M5 3l4 2m0 0L5 9m4-4l8 8"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 ></path>
               </svg>
               <span>Transaksi</span>

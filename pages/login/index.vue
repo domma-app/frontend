@@ -80,12 +80,17 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'landing'
+});
+
 const email = ref("");
 const password = ref("");
 const rememberMe = ref(false);
 const isLoading = ref(false);
 const error = ref("");
 const router = useRouter();
+const route = useRoute();
 const { login } = useAuth();
 
 // Toast state (only for success)
@@ -94,17 +99,22 @@ const toastMessage = ref("");
 const toastType = ref<"success">("success");
 const toastTimeout = ref<number | null>(null);
 
+// Get redirect path from query params if it exists
+const redirectPath = computed(() => {
+  return (route.query.redirect as string) || '/dashboard';
+});
+
 // Show success toast notification
 const showSuccessToast = (message: string) => {
   // Clear any existing timeout
   if (toastTimeout.value) {
     clearTimeout(toastTimeout.value);
   }
-
+  
   // Set toast content
   toastMessage.value = message;
   showToast.value = true;
-
+  
   // Auto dismiss after 5 seconds
   toastTimeout.value = window.setTimeout(() => {
     dismissToast();
@@ -124,10 +134,10 @@ const handleLogin = async () => {
   const config = useRuntimeConfig();
   const baseUrl = config.public.apiBaseUrl as string;
   console.log(baseUrl);
-
+  
   // Reset error
   error.value = "";
-
+  
   // Validate form
   if (!email.value || !password.value) {
     error.value = "All fields are required";
@@ -150,11 +160,12 @@ const handleLogin = async () => {
 
     // Show success toast
     showSuccessToast("Login successful!");
-
-    // Redirect to dashboard after a short delay
+    
+    // Redirect to dashboard or the intended destination after a short delay
     setTimeout(() => {
-      router.push("/dashboard");
+      router.push(redirectPath.value);
     }, 1500);
+    
   } catch (err: any) {
     error.value = err.message || "Login failed. Please try again.";
   } finally {
