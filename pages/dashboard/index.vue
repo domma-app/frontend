@@ -5,7 +5,9 @@
       <div class="bg-white rounded-lg shadow-sm p-6">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h1 class="text-2xl font-bold text-gray-800">Welcome, Student!</h1>
+            <h1 class="text-2xl font-bold text-gray-800">
+              Welcome, {{ userName }}!
+            </h1>
             <p class="text-gray-600">
               View your financial summary and recent activities here.
             </p>
@@ -444,4 +446,15 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+definePageMeta({
+  layout: "dashboard",
+});
+
+const { user } = useAuth();
+
+// Get user's name for display
+const userName = computed(() => {
+  return user.value?.full_name || "Student";
+});
+</script>
