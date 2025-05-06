@@ -366,6 +366,10 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: "dashboard",
+});
+
 // Get today's date and current time for defaults
 const today = new Date();
 const formattedDate = today.toISOString().split("T")[0];

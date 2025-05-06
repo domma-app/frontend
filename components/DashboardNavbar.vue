@@ -41,10 +41,10 @@
             </NuxtLink>
 
             <NuxtLink
-              to="/transaction"
+              to="/dashboard/transaction"
               class="px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
               :class="[
-                $route.path.startsWith('/transaction')
+                $route.path.startsWith('/dashboard/transaction')
                   ? 'text-green-500 bg-green-50'
                   : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
               ]"
@@ -80,10 +80,10 @@
             </NuxtLink>
 
             <NuxtLink
-              to="/budget"
+              to="/dashboard/budget"
               class="px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
               :class="[
-                $route.path.startsWith('/budget')
+                $route.path.startsWith('/dashboard/budget')
                   ? 'text-green-500 bg-green-50'
                   : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
               ]"
@@ -106,10 +106,10 @@
             </NuxtLink>
 
             <NuxtLink
-              to="/challenges"
+              to="/dashboard/challenges"
               class="px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
               :class="[
-                $route.path.startsWith('/challenges')
+                $route.path.startsWith('/dashboard/challenges')
                   ? 'text-green-500 bg-green-50'
                   : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
               ]"
@@ -307,10 +307,10 @@
           Dashboard
         </NuxtLink>
         <NuxtLink
-          to="/transaction"
+          to="/dashboard/transaction"
           class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
           :class="[
-            $route.path.startsWith('/transaction')
+            $route.path.startsWith('/dashboard/transaction')
               ? 'text-green-500 bg-green-50'
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
@@ -318,10 +318,10 @@
           Transaksi
         </NuxtLink>
         <NuxtLink
-          to="/budget"
+          to="/dashboard/budget"
           class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
           :class="[
-            $route.path.startsWith('/budget')
+            $route.path.startsWith('/dashboard/budget')
               ? 'text-green-500 bg-green-50'
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
@@ -329,10 +329,10 @@
           Anggaran
         </NuxtLink>
         <NuxtLink
-          to="/challenges"
+          to="/dashboard/challenges"
           class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
           :class="[
-            $route.path.startsWith('/challenges')
+            $route.path.startsWith('/dashboard/challenges')
               ? 'text-green-500 bg-green-50'
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
