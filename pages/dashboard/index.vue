@@ -173,7 +173,7 @@
             Recent Transactions
           </h2>
           <NuxtLink
-            to="/transaction"
+            to="/dashboard/transaction"
             class="text-sm text-green-500 hover:text-green-600 transition-colors"
           >
             View All
@@ -266,7 +266,7 @@
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-semibold text-gray-800">Monthly Budget</h2>
           <NuxtLink
-            to="/budget"
+            to="/dashboard/budget"
             class="text-sm text-green-500 hover:text-green-600 transition-colors"
           >
             View All
@@ -337,7 +337,7 @@
 
         <div class="grid grid-cols-2 gap-3">
           <NuxtLink
-            to="/transaction/new"
+            to="/dashboard/transaction/new"
             class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <svg
@@ -379,7 +379,7 @@
           </NuxtLink>
 
           <NuxtLink
-            to="/challenges"
+            to="/dashboard/challenges"
             class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <svg

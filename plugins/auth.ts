@@ -50,7 +50,7 @@ export default defineNuxtPlugin(() => {
       const baseUrl = config.public.apiBaseUrl as string;
 
       // Only intercept requests to our API
-      if (request.url.startsWith(baseUrl)) {
+      if (typeof request.url === "string" && request.url.startsWith(baseUrl)) {
         const modifiedRequest = addAuthHeaders(request);
         return originalFetch(modifiedRequest);
       }

@@ -3,7 +3,7 @@
     <div class="mb-6">
       <div class="flex items-center">
         <NuxtLink
-          to="/transaction"
+          to="/dashboard/transaction"
           class="mr-2 text-gray-500 hover:text-gray-700"
         >
           <svg
@@ -347,7 +347,7 @@
         <!-- Submit buttons -->
         <div class="flex justify-between">
           <NuxtLink
-            to="/transaction"
+            to="/dashboard/transaction"
             class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
           >
             Back

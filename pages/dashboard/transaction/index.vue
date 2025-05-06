@@ -6,7 +6,7 @@
         <p class="text-gray-600">Track Income Expenses</p>
       </div>
       <NuxtLink
-        to="/transaction/new"
+        to="/dashboard/transaction/new"
         class="bg-green-500 hover:bg-green-600 transition-colors text-white px-4 py-2 rounded-lg flex items-center"
       >
         <svg

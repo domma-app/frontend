@@ -1,24 +1,12 @@
-import { registerUser, loginUser } from "~/utils/api";
-
-export interface User {
-  id: string;
-  full_name: string;
-  university: string;
-  major: string;
-  phone: string;
-  email: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface AuthState {
-  user: User | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  isAuthenticated: boolean;
-  tokenExpiry: number | null;
-}
+import { useAuthService } from '~/services/api/auth';
+import type { 
+  AuthState, 
+  User, 
+  RegisterRequest, 
+  LoginRequest,
+  LoginResponse, 
+  RegisterResponse 
+} from '~/types/api';
 
 // Token expiry time in milliseconds
 const TOKEN_EXPIRY_REMEMBER = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -32,6 +20,8 @@ export function useAuth() {
     isAuthenticated: false,
     tokenExpiry: null,
   }));
+
+  const authService = useAuthService();
 
   // On app init, check for token in localStorage and sessionStorage
   onMounted(() => {
@@ -177,29 +167,18 @@ export function useAuth() {
   };
 
   // Register a new user
-  const register = async (userData: {
-    full_name: string;
-    university: string;
-    major: string;
-    phone: string;
-    email: string;
-    password: string;
-  }) => {
-    const response = await registerUser(userData);
+  const register = async (userData: RegisterRequest): Promise<RegisterResponse> => {
+    const response = await authService.register(userData);
     return response;
   };
 
   // Login user
-  const login = async (userData: {
-    email: string;
-    password: string;
-    rememberMe?: boolean;
-  }) => {
+  const login = async (userData: LoginRequest & { rememberMe?: boolean }): Promise<LoginResponse> => {
     const rememberMe = userData.rememberMe || false;
-    const response = await loginUser({
+    
+    const response = await authService.login({
       email: userData.email,
       password: userData.password,
-      rememberMe,
     });
 
     // If login successful, set auth state
@@ -216,7 +195,17 @@ export function useAuth() {
   };
 
   // Logout user
-  const logout = () => {
+  const logout = async () => {
+    // Call the server to invalidate the token if we have one
+    if (authState.value.accessToken) {
+      try {
+        await authService.logout(authState.value.accessToken);
+      } catch (error) {
+        console.error('Error during server logout:', error);
+        // Continue with local logout even if server logout fails
+      }
+    }
+    
     clearAuth();
     // Redirect will be handled by the component calling this function
   };

@@ -203,7 +203,7 @@ const handleRegister = async () => {
 
     // Call register from auth composable
     await register({
-      full_name: firstName.value + lastName.value,
+      full_name: `${firstName.value} ${lastName.value}`,
       university: "defaultUni",
       major: "defaultMajor",
       phone: "defaultPhone",
