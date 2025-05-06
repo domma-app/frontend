@@ -13,11 +13,11 @@ const { isAuthenticated } = useAuth();
 const router = useRouter();
 
 // Redirect to home page if not authenticated
-// onMounted(() => {
-//   if (!isAuthenticated.value) {
-//     router.push("/");
-//   }
-// });
+onMounted(() => {
+  if (!isAuthenticated.value) {
+    router.push("/");
+  }
+});
 
 // Watch for changes in authentication status
 watch(isAuthenticated, (newValue) => {
