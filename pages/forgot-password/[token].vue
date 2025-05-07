@@ -1,43 +1,145 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+  <div
+    class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-gray-100"
+  >
     <AuthCard title="Reset Password" subtitle="Enter your new password below">
+      <div class="flex justify-center mb-6">
+        <div
+          class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-green-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+            />
+          </svg>
+        </div>
+      </div>
+
       <form @submit.prevent="handleResetPassword" class="w-full">
-        <AuthInput
-          v-model="password"
-          label="New Password"
-          id="password"
-          type="password"
-          placeholder="Enter your new password"
-        />
-
-        <AuthInput
-          v-model="confirmPassword"
-          label="Confirm Password"
-          id="confirmPassword"
-          type="password"
-          placeholder="Confirm your new password"
-        />
-
         <div
           v-if="error"
-          class="mb-4 p-4 bg-red-50 text-red-500 text-sm rounded-lg"
+          class="mb-5 p-4 rounded-lg bg-red-50 text-red-600 text-sm border border-red-100 flex items-start"
         >
-          {{ error }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ error }}</span>
+        </div>
+
+        <div class="relative mb-5">
+          <label
+            for="password"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >New Password</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <input
+              v-model="password"
+              id="password"
+              type="password"
+              placeholder="Enter your new password"
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
+            />
+          </div>
+        </div>
+
+        <div class="relative mb-6">
+          <label
+            for="confirmPassword"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Confirm Password</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+            </div>
+            <input
+              v-model="confirmPassword"
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your new password"
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
+            />
+          </div>
         </div>
 
         <button
           type="submit"
-          class="w-full py-3 px-6 bg-green-500 text-white font-medium rounded-lg transition-colors hover:bg-green-600 mb-4"
+          class="w-full py-3.5 px-6 bg-green-500 text-white font-medium rounded-lg transition-all hover:bg-green-600 mb-4 shadow-md hover:shadow-lg shadow-green-500/20 active:scale-[0.98] flex items-center justify-center"
           :disabled="isLoading"
         >
+          <span
+            v-if="isLoading"
+            class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"
+          ></span>
           {{ isLoading ? "Resetting..." : "Reset Password" }}
         </button>
 
-        <p class="text-center text-sm text-gray-500">
+        <div class="relative mb-2">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-200"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-4 bg-white text-gray-500">Or</span>
+          </div>
+        </div>
+
+        <p class="text-center text-sm text-gray-500 mt-4">
           Remember your password?
           <NuxtLink
             to="/login"
-            class="text-green-500 font-medium hover:text-green-600 transition-colors"
+            class="text-green-500 font-medium hover:text-green-600 transition-colors hover:underline"
           >
             Back to login
           </NuxtLink>

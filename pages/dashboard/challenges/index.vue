@@ -97,11 +97,11 @@ const activeChallenges = ref<ActiveChallenge[]>([
 const catalogChallenges = ref<CatalogChallenge[]>([
   {
     id: 1,
-    title: "30-Day $5 Challenge",
+    title: "30-Day Rp5.000 Challenge",
     description: "Save Rp5.000 every day for a month",
     features: [
-      "Put away $5 each day",
-      "Save $150 in just one month",
+      "Put away Rp5.000 each day",
+      "Save Rp150.000 in just one month",
       "Perfect for beginners",
     ],
     targetText: "Target: Rp150.000",

@@ -1,5 +1,7 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center p-6 bg-gray-50">
+  <div
+    class="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-gray-50 to-gray-100"
+  >
     <!-- Toast notification (only for success) -->
     <Toast
       :show="showToast"
@@ -9,80 +11,260 @@
     />
 
     <AuthCard title="Create an account" subtitle="Sign up to get started">
+      <div class="flex justify-center mb-6">
+        <div
+          class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-green-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+            />
+          </svg>
+        </div>
+      </div>
+
       <form @submit.prevent="handleRegister" class="w-full">
         <div
           v-if="error"
-          class="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm"
+          class="mb-5 p-4 rounded-lg bg-red-50 text-red-600 text-sm border border-red-100 flex items-start"
         >
-          {{ error }}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-red-500 mr-2 flex-shrink-0 mt-0.5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span>{{ error }}</span>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <AuthInput
-            v-model="firstName"
-            label="First Name"
-            id="firstName"
-            type="text"
-            placeholder="Enter your first name"
-          />
-          <AuthInput
-            v-model="lastName"
-            label="Last Name"
-            id="lastName"
-            type="text"
-            placeholder="Enter your last name"
-          />
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+          <div class="relative">
+            <label
+              for="firstName"
+              class="block mb-2 text-sm font-medium text-gray-700"
+              >First Name</label
+            >
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <input
+                v-model="firstName"
+                id="firstName"
+                type="text"
+                placeholder="Enter your first name"
+                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
+              />
+            </div>
+          </div>
+          <div class="relative">
+            <label
+              for="lastName"
+              class="block mb-2 text-sm font-medium text-gray-700"
+              >Last Name</label
+            >
+            <div class="relative">
+              <div
+                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-5 w-5 text-gray-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
+                </svg>
+              </div>
+              <input
+                v-model="lastName"
+                id="lastName"
+                type="text"
+                placeholder="Enter your last name"
+                class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
+              />
+            </div>
+          </div>
         </div>
-        <AuthInput
-          v-model="email"
-          label="Email"
-          id="email"
-          type="email"
-          placeholder="Enter your email"
-        />
-        <AuthInput
-          v-model="password"
-          label="Password"
-          id="password"
-          type="password"
-          placeholder="Enter your password"
-        />
-        <AuthInput
-          v-model="confirmPassword"
-          label="Confirm Password"
-          id="confirmPassword"
-          type="password"
-          placeholder="Confirm your password"
-        />
-        <div class="mb-6">
-          <label class="flex items-start gap-2 text-sm text-gray-500">
+
+        <div class="relative mb-5">
+          <label
+            for="email"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Email</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+                />
+              </svg>
+            </div>
             <input
-              type="checkbox"
-              v-model="agreeToTerms"
-              class="mt-1 h-4 w-4 rounded border-gray-200 text-green-500 focus:ring-green-500"
+              v-model="email"
+              id="email"
+              type="email"
+              placeholder="Enter your email"
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
             />
+          </div>
+        </div>
+
+        <div class="relative mb-5">
+          <label
+            for="password"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                />
+              </svg>
+            </div>
+            <input
+              v-model="password"
+              id="password"
+              type="password"
+              placeholder="Enter your password"
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
+            />
+          </div>
+        </div>
+
+        <div class="relative mb-6">
+          <label
+            for="confirmPassword"
+            class="block mb-2 text-sm font-medium text-gray-700"
+            >Confirm Password</label
+          >
+          <div class="relative">
+            <div
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 text-gray-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+            </div>
+            <input
+              v-model="confirmPassword"
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm your password"
+              class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base outline-none duration-200 focus:border-green-500 focus:ring-2 focus:ring-green-500/20 placeholder-gray-400"
+            />
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label
+            class="flex items-start gap-2 text-sm text-gray-500 cursor-pointer group"
+          >
+            <div class="relative flex items-center mt-1">
+              <input
+                type="checkbox"
+                v-model="agreeToTerms"
+                class="h-4 w-4 rounded border-gray-200 text-green-500 focus:ring-green-500 transition-colors group-hover:border-green-400"
+              />
+              <div
+                class="absolute w-8 h-8 -left-2 -top-2 bg-green-50 rounded-full scale-0 group-hover:scale-100 transition-transform duration-200 -z-10"
+              ></div>
+            </div>
             <span>
               I Agree to the
               <a
                 href="#"
-                class="text-green-500 font-medium hover:text-green-600"
+                class="text-green-500 font-medium hover:text-green-600 hover:underline"
               >
                 Terms of Services
               </a>
               and
               <a
                 href="#"
-                class="text-green-500 font-medium hover:text-green-600"
+                class="text-green-500 font-medium hover:text-green-600 hover:underline"
               >
                 Privacy Policy
               </a>
             </span>
           </label>
         </div>
+
         <button
           type="submit"
           :disabled="!agreeToTerms || isLoading"
-          class="w-full bg-green-500 py-3 px-6 text-white rounded-lg font-medium transition-colors hover-bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center"
+          class="w-full bg-green-500 py-3.5 px-6 text-white rounded-lg font-medium transition-all hover:bg-green-600 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center shadow-md hover:shadow-lg shadow-green-500/20 active:scale-[0.98]"
         >
           <span v-if="isLoading" class="mr-2">
             <svg
@@ -108,11 +290,21 @@
           </span>
           Create Account
         </button>
-        <p class="text-center mt-6 text-sm text-gray-500">
+
+        <div class="relative mt-8 mb-2">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-200"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-4 bg-white text-gray-500">Or</span>
+          </div>
+        </div>
+
+        <p class="text-center mt-5 text-sm text-gray-500">
           Already have an account?
           <NuxtLink
             to="/login"
-            class="text-green-500 font-medium hover-text-green-600 transition-colors"
+            class="text-green-500 font-medium hover:text-green-600 transition-colors hover:underline"
           >
             Sign In
           </NuxtLink>
@@ -124,7 +316,7 @@
 
 <script setup lang="ts">
 definePageMeta({
-  layout: 'landing'
+  layout: "landing",
 });
 
 const firstName = ref("");
