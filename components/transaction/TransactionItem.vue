@@ -142,10 +142,6 @@ const props = defineProps<{
 
 defineEmits(["edit", "delete"]);
 
-function formatCurrency(amount: number): string {
-  return amount.toLocaleString("id-ID");
-}
-
 function formatDate(date: string | Date): string {
   const d = new Date(date);
   const now = new Date();

@@ -36,8 +36,4 @@ const props = defineProps({
 const balance = computed(() => {
   return props.totalIncome - props.totalExpenses;
 });
-
-function formatCurrency(amount: number): string {
-  return amount.toLocaleString("id-ID");
-}
 </script>
