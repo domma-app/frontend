@@ -92,18 +92,10 @@
 
 <script setup lang="ts">
 import TransactionItem from "./TransactionItem.vue";
-
-interface Transaction {
-  id: string | number;
-  type: "income" | "expense";
-  description: string;
-  category: string;
-  amount: number;
-  date: string | Date;
-}
+import type { UITransaction } from "~/types/api";
 
 const props = defineProps<{
-  transactions: Transaction[];
+  transactions: UITransaction[];
   currentPage: number;
   totalPages: number;
 }>();
@@ -117,7 +109,7 @@ const groupedTransactions = computed(() => {
     {
       date: string;
       title: string;
-      transactions: Transaction[];
+      transactions: UITransaction[];
     }
   > = {};
 

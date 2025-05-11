@@ -127,17 +127,10 @@
 </template>
 
 <script setup lang="ts">
-interface Transaction {
-  id: string | number;
-  type: "income" | "expense";
-  description: string;
-  category: string;
-  amount: number;
-  date: string | Date;
-}
+import type { UITransaction } from '~/types/api';
 
 const props = defineProps<{
-  transaction: Transaction;
+  transaction: UITransaction;
 }>();
 
 defineEmits(["edit", "delete"]);
@@ -161,6 +154,10 @@ function formatDate(date: string | Date): string {
   } else {
     return d.toLocaleDateString();
   }
+}
+
+function formatCurrency(amount: number): string {
+  return amount.toLocaleString('id-ID');
 }
 
 function getCategoryColorClass(category: string): string {

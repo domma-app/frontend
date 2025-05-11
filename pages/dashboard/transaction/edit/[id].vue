@@ -21,13 +21,98 @@
             ></path>
           </svg>
         </NuxtLink>
-        <h1 class="text-2xl font-bold text-gray-800">Add New Transaction</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Edit Transaction</h1>
       </div>
-      <p>Record your income or expense</p>
+      <p>Update your income or expense transaction</p>
     </div>
 
-    <div class="bg-white rounded-lg p-6 shadow-sm">
-      <form @submit.prevent="submitTransaction">
+    <!-- Loading State -->
+    <div
+      v-if="isLoading"
+      class="bg-white rounded-lg shadow-sm p-8 flex justify-center items-center"
+    >
+      <div class="inline-flex items-center">
+        <svg
+          class="animate-spin -ml-1 mr-3 h-5 w-5 text-green-500"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            class="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            stroke-width="4"
+          ></circle>
+          <path
+            class="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
+        </svg>
+        <span>Loading transaction...</span>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div
+      v-else-if="fetchError"
+      class="bg-white rounded-lg shadow-sm p-6 text-center"
+    >
+      <div class="text-red-500 mb-4">
+        <svg
+          class="h-12 w-12 mx-auto"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">
+        Failed to load transaction
+      </h3>
+      <p class="text-sm text-gray-500 mb-4">{{ fetchError }}</p>
+      <div class="flex justify-center space-x-4">
+        <button
+          @click="fetchTransaction"
+          class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          <svg
+            class="h-4 w-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            ></path>
+          </svg>
+          Try Again
+        </button>
+        <NuxtLink
+          to="/dashboard/transaction"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Back to Transactions
+        </NuxtLink>
+      </div>
+    </div>
+
+    <div v-else class="bg-white rounded-lg p-6 shadow-sm">
+      <form @submit.prevent="updateTransaction">
         <!-- Transaction Type -->
         <div class="mb-6">
           <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -382,7 +467,7 @@
               </svg>
               Saving...
             </span>
-            <span v-else>Save Transaction</span>
+            <span v-else>Update Transaction</span>
           </button>
         </div>
       </form>
@@ -413,10 +498,10 @@
               </svg>
             </div>
             <h3 class="text-lg font-medium text-gray-900">
-              Transaction Saved!
+              Transaction Updated!
             </h3>
             <p class="mt-2 text-sm text-gray-600">
-              Your transaction has been successfully saved.
+              Your transaction has been successfully updated.
             </p>
             <div class="mt-4">
               <p class="text-sm text-gray-500">
@@ -437,27 +522,39 @@
 
 <script setup lang="ts">
 import { useTransactionService } from "~/services/api/transaction";
-import type { TransactionRequest, TransactionRecurring } from "~/types/api";
+import type {
+  Transaction,
+  TransactionRequest,
+  TransactionRecurring,
+  TransactionUpdateRequest,
+} from "~/types/api";
 
 definePageMeta({
   layout: "dashboard",
 });
 
-// Get today's date and current time for defaults
-const today = new Date();
-const formattedDate = today.toISOString().split("T")[0];
-const hours = String(today.getHours()).padStart(2, "0");
-const minutes = String(today.getMinutes()).padStart(2, "0");
-const formattedTime = `${hours}:${minutes}`;
+const route = useRoute();
+const router = useRouter();
+const transactionService = useTransactionService();
 
-// Transaction data
+// Transaction ID from the route
+const id = computed(() => route.params.id as string);
+
+// States
+const isLoading = ref(true);
+const loading = ref(false);
+const fetchError = ref("");
+const error = ref("");
+const success = ref(false);
+
+// Transaction data with defaults
 const transaction = ref({
   type: "expense",
   amount: "",
   description: "",
   category: "",
-  date: formattedDate,
-  time: formattedTime,
+  date: "",
+  time: "",
   paymentMethod: "",
   notes: "",
   isRecurring: false,
@@ -469,19 +566,71 @@ const transaction = ref({
   },
 });
 
-const loading = ref(false);
-const error = ref("");
-const success = ref(false);
-const router = useRouter();
-const transactionService = useTransactionService();
+// Fetch the transaction when the component is mounted
+onMounted(() => {
+  fetchTransaction();
+});
 
-async function submitTransaction() {
+// Function to fetch the transaction details
+async function fetchTransaction() {
+  isLoading.value = true;
+  fetchError.value = "";
+
+  try {
+    const response = await transactionService.getTransaction(id.value);
+
+    if (!response.status) {
+      throw new Error(response.message || "Failed to fetch transaction");
+    }
+
+    const transactionData = response.data;
+    console.log(
+      "Transaction data from API:",
+      JSON.stringify(transactionData, null, 2)
+    );
+
+    // Map the API response to our form structure
+    transaction.value = {
+      type: transactionData.type || "expense",
+      amount: transactionData.amount ? transactionData.amount.toString() : "",
+      description: transactionData.description || "",
+      category: transactionData.category || "",
+      date: transactionData.transaction_date || "",
+      time: transactionData.transaction_time || "",
+      paymentMethod: transactionData.payment_method || "",
+      notes: transactionData.notes || "",
+      isRecurring: !!transactionData.recurring,
+      recurring: {
+        frequency: transactionData.recurring?.frequency || "monthly",
+        endType: transactionData.recurring?.end_type || "never",
+        endDate: transactionData.recurring?.end_date || "",
+        occurrences: transactionData.recurring?.occurrences
+          ? Number(transactionData.recurring.occurrences)
+          : 1,
+      },
+    };
+
+    console.log(
+      "Mapped form data:",
+      JSON.stringify(transaction.value, null, 2)
+    );
+  } catch (err) {
+    fetchError.value =
+      err instanceof Error ? err.message : "Failed to fetch transaction";
+    console.error("Error fetching transaction:", err);
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Function to update the transaction
+async function updateTransaction() {
   try {
     loading.value = true;
     error.value = "";
-    
-    // Prepare API request payload
-    const payload: TransactionRequest = {
+
+    // Prepare API request payload - ensure all fields match the API expectations exactly
+    const payload: TransactionUpdateRequest = {
       amount: Number(transaction.value.amount),
       type: transaction.value.type as "income" | "expense",
       description: transaction.value.description,
@@ -489,9 +638,13 @@ async function submitTransaction() {
       transaction_date: transaction.value.date,
       transaction_time: transaction.value.time,
       payment_method: transaction.value.paymentMethod,
-      notes: transaction.value.notes || undefined,
     };
-    
+
+    // Only include notes if it's not empty
+    if (transaction.value.notes && transaction.value.notes.trim() !== "") {
+      payload.notes = transaction.value.notes;
+    }
+
     // Add recurring data if enabled
     if (transaction.value.isRecurring) {
       const recurring: TransactionRecurring = {
@@ -505,33 +658,51 @@ async function submitTransaction() {
           | "on_date"
           | "after_occurrences",
       };
-      
+
       // Add the appropriate end date or occurrences based on the end type
-      if (recurring.end_type === "on_date") {
+      if (
+        recurring.end_type === "on_date" &&
+        transaction.value.recurring.endDate
+      ) {
         recurring.end_date = transaction.value.recurring.endDate;
-      } else if (recurring.end_type === "after_occurrences") {
+      } else if (recurring.end_type === "never") {
+        recurring.end_date = null;
+        recurring.occurrences = null;
+      } else if (
+        recurring.end_type === "after_occurrences" &&
+        transaction.value.recurring.occurrences
+      ) {
         recurring.occurrences = Number(transaction.value.recurring.occurrences);
+        recurring.end_date = null;
       }
-      
+
       payload.recurring = recurring;
+    } else {
+      // If recurring was disabled but previously enabled, send null to remove it
+      payload.recurring = null;
     }
-    
-    // Call the API
-    const response = await transactionService.createTransaction(payload);
-    
+
+    console.log("Sending payload:", JSON.stringify(payload, null, 2));
+
+    // Call the API to update the transaction
+    const response = await transactionService.updateTransaction(
+      id.value,
+      payload
+    );
+
     if (!response.status) {
-      throw new Error(response.message || "Failed to create transaction");
+      throw new Error(response.message || "Failed to update transaction");
     }
-    
-    // Show success and reset or redirect
+
+    // Show success and redirect
     success.value = true;
     setTimeout(() => {
       router.push("/dashboard/transaction");
     }, 1500);
   } catch (err) {
     error.value =
-      err instanceof Error ? err.message : "Failed to create transaction";
-    console.error("Transaction creation error:", err);
+      err instanceof Error ? err.message : "Failed to update transaction";
+    console.error("Transaction update error:", err);
   } finally {
     loading.value = false;
   }

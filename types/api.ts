@@ -55,3 +55,88 @@ export interface AuthState {
   isAuthenticated: boolean;
   tokenExpiry: number | null;
 }
+
+/**
+ * Transaction types
+ */
+export interface TransactionRecurring {
+  frequency: "daily" | "weekly" | "monthly" | "yearly";
+  end_type: "never" | "on_date" | "after_occurrences";
+  end_date?: string | null;
+  occurrences?: number | null;
+}
+
+export interface TransactionSummary {
+  totalIncome: number;
+  totalExpense: number;
+  balance: number;
+  transactionCount: number;
+  incomeCount: number;
+  expenseCount: number;
+}
+
+export interface TransactionSummaryResponse {
+  status: boolean;
+  message: string;
+  data: TransactionSummary;
+}
+
+export interface TransactionRequest {
+  amount: number;
+  type: "income" | "expense";
+  description: string;
+  category: string;
+  transaction_date: string;
+  transaction_time: string;
+  payment_method: string;
+  notes?: string;
+  recurring?: TransactionRecurring;
+}
+
+// Allow explicit null to remove recurring when update
+export interface TransactionUpdateRequest
+  extends Omit<Partial<TransactionRequest>, "recurring"> {
+  recurring?: TransactionRecurring | null;
+}
+
+export interface Transaction {
+  id: string | number;
+  amount: number;
+  type: "income" | "expense";
+  description: string;
+  category: string;
+  transaction_date: string;
+  transaction_time: string;
+  payment_method: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+  recurring?: TransactionRecurring;
+}
+
+export interface TransactionResponse {
+  status: boolean;
+  message: string;
+  data: Transaction;
+}
+
+export interface TransactionListResponse {
+  status: boolean;
+  message: string;
+  data: Transaction[];
+}
+
+export interface TransactionDeleteResponse {
+  status: boolean;
+  message: string;
+}
+
+// UI-specific transaction type for frontend display
+export interface UITransaction {
+  id: string | number;
+  type: "income" | "expense";
+  description: string;
+  category: string;
+  amount: number;
+  date: string | Date;
+}
