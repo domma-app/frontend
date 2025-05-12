@@ -5,6 +5,7 @@ import type {
   BudgetResponse,
   BudgetListResponse,
   BudgetSummaryResponse,
+  BudgetDeleteResponse,
 } from "~/types/api";
 
 /**
@@ -51,6 +52,40 @@ export class BudgetService {
     }
 
     return response.data as BudgetListResponse;
+  }
+
+  /**
+   * Update an existing budget
+   */
+  async updateBudget(
+    id: string,
+    budgetData: BudgetRequest
+  ): Promise<BudgetResponse> {
+    const response = await this.apiClient.put<BudgetResponse>(
+      `${this.ENDPOINTS.BUDGETS}/${id}`,
+      budgetData
+    );
+
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    return response.data as BudgetResponse;
+  }
+
+  /**
+   * Delete a budget
+   */
+  async deleteBudget(id: string): Promise<BudgetDeleteResponse> {
+    const response = await this.apiClient.delete<BudgetDeleteResponse>(
+      `${this.ENDPOINTS.BUDGETS}/${id}`
+    );
+
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    return response.data as BudgetDeleteResponse;
   }
 
   /**

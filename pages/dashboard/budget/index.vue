@@ -294,8 +294,45 @@ function deleteBudget(category: string) {
       } budget?`
     )
   ) {
-    budgetData.value = budgetData.value.filter((b) => b.id !== category);
-    alert(`Budget for ${budgetIcons[category]?.name || category} deleted!`);
+    try {
+      loading.value = true;
+      // Find the budget by id
+      const budget = budgetData.value.find((b) => b.id === category);
+      if (!budget) {
+        throw new Error("Budget not found");
+      }
+
+      // Call the API to delete the budget
+      budgetService
+        .deleteBudget(budget.id)
+        .then(() => {
+          // Remove from local state after successful deletion
+          budgetData.value = budgetData.value.filter((b) => b.id !== category);
+
+          // Show success message
+          alert(
+            `Budget for ${budgetIcons[category]?.name || category} deleted!`
+          );
+
+          // Refresh the summary data
+          if (summaryComponent.value) {
+            summaryComponent.value.refresh();
+          }
+        })
+        .catch((err) => {
+          error.value =
+            err instanceof Error ? err.message : "Failed to delete budget";
+          console.error("Error deleting budget:", err);
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+    } catch (err) {
+      error.value =
+        err instanceof Error ? err.message : "Failed to delete budget";
+      console.error("Error deleting budget:", err);
+      loading.value = false;
+    }
   }
 }
 
@@ -318,15 +355,26 @@ async function saveBudget(budgetFormData: any) {
     };
 
     if (isEditing.value) {
-      // Update existing budget - this would be implemented in the API service
+      // Update existing budget
+      const budget = budgetData.value.find(
+        (b) => b.id === editingCategory.value
+      );
+      if (!budget) {
+        throw new Error("Budget not found");
+      }
+
+      // Call the API to update the budget
+      const response = await budgetService.updateBudget(
+        budget.id,
+        budgetRequest
+      );
+
+      // Update the local state with the response data
       const index = budgetData.value.findIndex(
         (b) => b.id === editingCategory.value
       );
       if (index !== -1) {
-        // Temporary: Just update local state until we implement API update
-        budgetData.value[index].amount = budgetFormData.amount;
-        budgetData.value[index].month_year = budgetFormData.yearMonth;
-        budgetData.value[index].notes = budgetFormData.notes || "";
+        budgetData.value[index] = response.data;
 
         // Show success message
         success.value = true;

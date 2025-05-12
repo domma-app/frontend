@@ -191,6 +191,11 @@ export interface BudgetSummaryResponse {
   data: BudgetSummary;
 }
 
+export interface BudgetDeleteResponse {
+  status: boolean;
+  message: string;
+}
+
 // UI-specific budget type for frontend display
 export interface UIBudget {
   id: string;
