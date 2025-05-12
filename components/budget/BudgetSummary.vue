@@ -5,30 +5,12 @@
         <h2 class="text-xl font-semibold text-gray-800">
           Monthly Budget Summary
         </h2>
-        <div class="flex items-center">
-          <span class="text-sm text-gray-500 mr-2">{{
-            new Date().toLocaleDateString("en-US", {
-              month: "long",
-              year: "numeric",
-            })
-          }}</span>
-          <select
+        <div class="flex items-center space-x-2">
+          <input
             v-model="selectedMonth"
+            type="month"
             class="text-sm border-gray-300 rounded-md shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
-          >
-            <option value="0">January</option>
-            <option value="1">February</option>
-            <option value="2">March</option>
-            <option value="3">April</option>
-            <option value="4">May</option>
-            <option value="5">June</option>
-            <option value="6">July</option>
-            <option value="7">August</option>
-            <option value="8">September</option>
-            <option value="9">October</option>
-            <option value="10">November</option>
-            <option value="11">December</option>
-          </select>
+          />
         </div>
       </div>
 
@@ -68,8 +50,28 @@ const props = defineProps<{
 
 const emit = defineEmits(["update:selectedMonth"]);
 
+// Create a date object
+const now = new Date();
+const currentYear = ref(now.getFullYear());
+const currentMonthIndex = now.getMonth();
+
+// Format current month and year as YYYY-MM for the input
+const currentYearMonth = computed(() => {
+  return `${currentYear.value}-${String(
+    parseInt(props.selectedMonth) + 1
+  ).padStart(2, "0")}`;
+});
+
 const selectedMonth = computed({
-  get: () => props.selectedMonth,
-  set: (value) => emit("update:selectedMonth", value),
+  get: () => currentYearMonth.value,
+  set: (value) => {
+    // Parse the YYYY-MM format value
+    const [year, month] = value.split("-");
+    // Update the current year ref
+    currentYear.value = parseInt(year);
+    // Month values in input are 1-12, but we need 0-11 for JS Date
+    const monthIndex = parseInt(month) - 1;
+    emit("update:selectedMonth", monthIndex.toString());
+  },
 });
 </script>

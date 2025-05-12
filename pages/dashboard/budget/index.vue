@@ -57,7 +57,23 @@ definePageMeta({
   layout: "dashboard",
 });
 
-const selectedMonth = ref(new Date().getMonth().toString());
+// Update to store both year and month
+const selectedDate = ref({
+  year: new Date().getFullYear(),
+  month: new Date().getMonth(),
+});
+
+// For compatibility with the BudgetSummary component
+const selectedMonth = computed({
+  get: () => selectedDate.value.month.toString(),
+  set: (value) => {
+    selectedDate.value.month = parseInt(value);
+
+    // The event from BudgetSummary includes year changes
+    // The year is handled separately in the BudgetSummary component
+  },
+});
+
 const showNewBudgetModal = ref(false);
 const isEditing = ref(false);
 const editingCategory = ref("");
@@ -91,10 +107,15 @@ const editingBudget = computed(() => {
   const budget = budgetData.value.find((b) => b.id === editingCategory.value);
   if (!budget) return null;
 
+  // Format the current year and month for the form
+  const currentYearMonth = `${selectedDate.value.year}-${String(
+    selectedDate.value.month + 1
+  ).padStart(2, "0")}`;
+
   return {
     category: budget.id,
     amount: budget.budget,
-    period: "monthly",
+    yearMonth: currentYearMonth,
     notes: "",
     notifications: true,
   };
@@ -125,6 +146,9 @@ function closeModal() {
 }
 
 function saveBudget(budgetFormData: any) {
+  // Extract year and month from the yearMonth string (format: YYYY-MM)
+  const [year, month] = budgetFormData.yearMonth.split("-").map(Number);
+
   if (isEditing.value) {
     // Update existing budget
     const index = budgetData.value.findIndex(
@@ -135,7 +159,7 @@ function saveBudget(budgetFormData: any) {
       alert(
         `Budget for ${
           budgetIcons[editingCategory.value]?.name || editingCategory.value
-        } updated!`
+        } updated for ${month}/${year}!`
       );
     }
   } else {
@@ -148,7 +172,7 @@ function saveBudget(budgetFormData: any) {
     alert(
       `Budget for ${
         budgetIcons[budgetFormData.category]?.name || budgetFormData.category
-      } created!`
+      } created for ${month}/${year}!`
     );
   }
 

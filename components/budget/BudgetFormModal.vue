@@ -66,21 +66,18 @@
 
           <div class="mb-4">
             <label
-              for="budgetPeriod"
+              for="budgetYearMonth"
               class="block text-sm font-medium text-gray-700 mb-2"
             >
-              Budget Period
+              Budget Month
             </label>
-            <select
-              id="budgetPeriod"
-              v-model="budgetData.period"
+            <input
+              type="month"
+              id="budgetYearMonth"
+              v-model="budgetData.yearMonth"
               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
               required
-            >
-              <option value="monthly">Monthly</option>
-              <option value="weekly">Weekly</option>
-              <option value="yearly">Yearly</option>
-            </select>
+            />
           </div>
 
           <div class="mb-4">
@@ -140,7 +137,7 @@ const props = defineProps<{
   initialData?: {
     category: string;
     amount: number | null;
-    period: string;
+    yearMonth: string;
     notes: string;
     notifications: boolean;
   } | null;
@@ -148,10 +145,16 @@ const props = defineProps<{
 
 const emit = defineEmits(["close", "submit"]);
 
+// Get current year and month in YYYY-MM format
+const now = new Date();
+const currentYearMonth = `${now.getFullYear()}-${String(
+  now.getMonth() + 1
+).padStart(2, "0")}`;
+
 const defaultData = {
   category: "",
   amount: null as number | null,
-  period: "monthly",
+  yearMonth: currentYearMonth,
   notes: "",
   notifications: true,
 };
@@ -163,7 +166,10 @@ watch(
   () => props.initialData,
   (newVal) => {
     if (newVal) {
-      budgetData.value = { ...newVal };
+      budgetData.value = {
+        ...newVal,
+        yearMonth: newVal.yearMonth || currentYearMonth,
+      };
     } else {
       budgetData.value = { ...defaultData };
     }
