@@ -2,8 +2,9 @@
   <div v-if="loading" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div v-for="i in 3" :key="i" class="bg-white rounded-lg shadow-sm p-4">
       <div class="animate-pulse flex flex-col">
-        <div class="h-2 bg-gray-200 rounded w-1/4 mb-2"></div>
-        <div class="h-6 bg-gray-200 rounded w-1/2"></div>
+        <div class="h-2 bg-gray-200 rounded w-1/3 mb-2"></div>
+        <div class="h-8 bg-gray-200 rounded w-2/3 mb-3"></div>
+        <div class="h-2 bg-gray-200 rounded w-1/4 mt-1"></div>
       </div>
     </div>
   </div>

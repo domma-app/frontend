@@ -105,7 +105,10 @@
 
     <div v-else>
       <!-- Budget Summary -->
-      <BudgetSummary v-model:selectedMonth="selectedMonth" />
+      <BudgetSummary
+        ref="summaryComponent"
+        v-model:selectedMonth="selectedMonth"
+      />
 
       <!-- Budget Categories -->
       <BudgetCategoriesList
@@ -123,7 +126,7 @@
       @close="closeModal"
       @submit="saveBudget"
     />
-    
+
     <!-- Success message -->
     <div
       v-if="success"
@@ -149,9 +152,7 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900">
-            Budget Saved!
-          </h3>
+          <h3 class="text-lg font-medium text-gray-900">Budget Saved!</h3>
           <p class="mt-2 text-sm text-gray-600">
             Your budget has been successfully saved.
           </p>
@@ -173,6 +174,7 @@
 import { budgetIcons } from "~/components/budget/budgetIcons";
 import { useBudgetService } from "~/services";
 import type { Budget, UIBudget, BudgetRequest } from "~/types/api";
+import BudgetSummary from "~/components/budget/BudgetSummary.vue";
 
 definePageMeta({
   layout: "dashboard",
@@ -182,6 +184,7 @@ const budgetService = useBudgetService();
 const loading = ref(true);
 const error = ref("");
 const success = ref(false);
+const summaryComponent = ref<InstanceType<typeof BudgetSummary> | null>(null);
 
 // Update to store both year and month
 const selectedDate = ref({
@@ -194,7 +197,7 @@ const selectedMonth = computed({
   get: () => selectedDate.value.month.toString(),
   set: (value) => {
     selectedDate.value.month = parseInt(value);
-    
+
     // The event from BudgetSummary includes year changes
     // The year is handled separately in the BudgetSummary component
   },
@@ -210,10 +213,10 @@ const budgetData = ref<Budget[]>([]);
 // Function to hide the success message and clear any redirect timer
 function hideSuccessMessage() {
   success.value = false;
-  const timerId = window.sessionStorage.getItem('budgetRedirectTimer');
+  const timerId = window.sessionStorage.getItem("budgetRedirectTimer");
   if (timerId) {
     clearTimeout(parseInt(timerId));
-    window.sessionStorage.removeItem('budgetRedirectTimer');
+    window.sessionStorage.removeItem("budgetRedirectTimer");
   }
 }
 
@@ -222,9 +225,14 @@ async function fetchBudgets() {
   try {
     loading.value = true;
     error.value = "";
-    
+
     const response = await budgetService.getBudgets();
     budgetData.value = response.data.budgets || [];
+
+    // Refresh the summary after loading budgets
+    if (summaryComponent.value) {
+      summaryComponent.value.refresh();
+    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Failed to load budgets";
     console.error("Budget loading error:", err);
@@ -240,7 +248,8 @@ onMounted(() => {
 
 const budgetCategories = computed(() => {
   return budgetData.value.map((budget) => {
-    const icon = budgetIcons[budget.category.toLowerCase()] || budgetIcons.other;
+    const icon =
+      budgetIcons[budget.category.toLowerCase()] || budgetIcons.other;
     return {
       id: budget.id,
       name: icon.name || budget.category,
@@ -299,15 +308,15 @@ function closeModal() {
 async function saveBudget(budgetFormData: any) {
   try {
     loading.value = true;
-    
+
     // Prepare the data for API
     const budgetRequest: BudgetRequest = {
       category: budgetFormData.category,
       amount: budgetFormData.amount,
       month_year: budgetFormData.yearMonth,
-      notes: budgetFormData.notes || ""
+      notes: budgetFormData.notes || "",
     };
-    
+
     if (isEditing.value) {
       // Update existing budget - this would be implemented in the API service
       const index = budgetData.value.findIndex(
@@ -318,39 +327,50 @@ async function saveBudget(budgetFormData: any) {
         budgetData.value[index].amount = budgetFormData.amount;
         budgetData.value[index].month_year = budgetFormData.yearMonth;
         budgetData.value[index].notes = budgetFormData.notes || "";
-        
+
         // Show success message
         success.value = true;
-        
+
         // Auto-hide success message after 5 seconds if user doesn't click Continue
         const redirectTimer = setTimeout(() => {
           success.value = false;
         }, 5000);
-        
+
         // Store the timer so it can be cancelled if user clicks Continue
-        window.sessionStorage.setItem('budgetRedirectTimer', redirectTimer.toString());
+        window.sessionStorage.setItem(
+          "budgetRedirectTimer",
+          redirectTimer.toString()
+        );
       }
     } else {
       // Create new budget
       const response = await budgetService.createBudget(budgetRequest);
-      
+
       // Add the new budget to the local state
       budgetData.value.push(response.data);
-      
+
       // Show success message
       success.value = true;
-      
+
       // Auto-hide success message after 5 seconds if user doesn't click Continue
       const redirectTimer = setTimeout(() => {
         success.value = false;
       }, 5000);
-      
+
       // Store the timer so it can be cancelled if user clicks Continue
-      window.sessionStorage.setItem('budgetRedirectTimer', redirectTimer.toString());
+      window.sessionStorage.setItem(
+        "budgetRedirectTimer",
+        redirectTimer.toString()
+      );
     }
 
     closeModal();
     fetchBudgets(); // Refresh the data from the API
+
+    // Refresh the summary after saving a budget
+    if (summaryComponent.value) {
+      summaryComponent.value.refresh();
+    }
   } catch (err) {
     error.value = err instanceof Error ? err.message : "Failed to save budget";
     console.error("Error saving budget:", err);

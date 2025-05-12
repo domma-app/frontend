@@ -3,7 +3,8 @@ import type {
   BudgetRequest,
   Budget,
   BudgetResponse,
-  BudgetListResponse
+  BudgetListResponse,
+  BudgetSummaryResponse,
 } from "~/types/api";
 
 /**
@@ -12,6 +13,7 @@ import type {
 export class BudgetService {
   private readonly ENDPOINTS = {
     BUDGETS: "/budgets",
+    SUMMARY: "/budgets/summary",
   };
 
   private apiClient;
@@ -23,9 +25,7 @@ export class BudgetService {
   /**
    * Create a new budget
    */
-  async createBudget(
-    budgetData: BudgetRequest
-  ): Promise<BudgetResponse> {
+  async createBudget(budgetData: BudgetRequest): Promise<BudgetResponse> {
     const response = await this.apiClient.post<BudgetResponse>(
       this.ENDPOINTS.BUDGETS,
       budgetData
@@ -52,9 +52,24 @@ export class BudgetService {
 
     return response.data as BudgetListResponse;
   }
+
+  /**
+   * Get budget summary for a specific month and year
+   */
+  async getBudgetSummary(monthYear: string): Promise<BudgetSummaryResponse> {
+    const response = await this.apiClient.get<BudgetSummaryResponse>(
+      `${this.ENDPOINTS.SUMMARY}?month_year=${monthYear}`
+    );
+
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    return response.data as BudgetSummaryResponse;
+  }
 }
 
 // Create a composable to use the budget service
 export function useBudgetService() {
   return new BudgetService();
-} 
+}

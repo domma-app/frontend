@@ -178,6 +178,19 @@ export interface BudgetListResponse {
   };
 }
 
+export interface BudgetSummary {
+  totalBudget: number;
+  totalSpent: number;
+  remaining: number;
+  month_year: string;
+}
+
+export interface BudgetSummaryResponse {
+  status: boolean;
+  message: string;
+  data: BudgetSummary;
+}
+
 // UI-specific budget type for frontend display
 export interface UIBudget {
   id: string;
