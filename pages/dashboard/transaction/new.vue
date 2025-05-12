@@ -419,9 +419,12 @@
               Your transaction has been successfully saved.
             </p>
             <div class="mt-4">
-              <p class="text-sm text-gray-500">
-                Redirecting to transactions...
-              </p>
+              <button
+                @click="goToTransactions"
+                class="mt-3 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+              >
+                Continue
+              </button>
             </div>
           </div>
         </div>
@@ -479,7 +482,7 @@ async function submitTransaction() {
   try {
     loading.value = true;
     error.value = "";
-    
+
     // Prepare API request payload
     const payload: TransactionRequest = {
       amount: Number(transaction.value.amount),
@@ -491,7 +494,7 @@ async function submitTransaction() {
       payment_method: transaction.value.paymentMethod,
       notes: transaction.value.notes || undefined,
     };
-    
+
     // Add recurring data if enabled
     if (transaction.value.isRecurring) {
       const recurring: TransactionRecurring = {
@@ -505,29 +508,34 @@ async function submitTransaction() {
           | "on_date"
           | "after_occurrences",
       };
-      
+
       // Add the appropriate end date or occurrences based on the end type
       if (recurring.end_type === "on_date") {
         recurring.end_date = transaction.value.recurring.endDate;
       } else if (recurring.end_type === "after_occurrences") {
         recurring.occurrences = Number(transaction.value.recurring.occurrences);
       }
-      
+
       payload.recurring = recurring;
     }
-    
+
     // Call the API
     const response = await transactionService.createTransaction(payload);
-    
+
     if (!response.status) {
       throw new Error(response.message || "Failed to create transaction");
     }
-    
-    // Show success and reset or redirect
+
+    // Show success message
     success.value = true;
-    setTimeout(() => {
-      router.push("/dashboard/transaction");
-    }, 1500);
+
+    // Auto-redirect after 5 seconds if user doesn't click Continue
+    const redirectTimer = setTimeout(() => {
+      goToTransactions();
+    }, 5000);
+
+    // Store the timer so it can be cancelled if user clicks Continue
+    window.sessionStorage.setItem("redirectTimer", redirectTimer.toString());
   } catch (err) {
     error.value =
       err instanceof Error ? err.message : "Failed to create transaction";
@@ -535,5 +543,16 @@ async function submitTransaction() {
   } finally {
     loading.value = false;
   }
+}
+
+function goToTransactions() {
+  // Clear any existing redirect timer
+  const timerId = window.sessionStorage.getItem("redirectTimer");
+  if (timerId) {
+    clearTimeout(parseInt(timerId));
+    window.sessionStorage.removeItem("redirectTimer");
+  }
+
+  router.push("/dashboard/transaction");
 }
 </script>

@@ -504,9 +504,12 @@
               Your transaction has been successfully updated.
             </p>
             <div class="mt-4">
-              <p class="text-sm text-gray-500">
-                Redirecting to transactions...
-              </p>
+              <button
+                @click="goToTransactions"
+                class="mt-3 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+              >
+                Continue
+              </button>
             </div>
           </div>
         </div>
@@ -694,11 +697,16 @@ async function updateTransaction() {
       throw new Error(response.message || "Failed to update transaction");
     }
 
-    // Show success and redirect
+    // Show success message
     success.value = true;
-    setTimeout(() => {
-      router.push("/dashboard/transaction");
-    }, 1500);
+
+    // Auto-redirect after 5 seconds if user doesn't click Continue
+    const redirectTimer = setTimeout(() => {
+      goToTransactions();
+    }, 5000);
+
+    // Store the timer so it can be cancelled if user clicks Continue
+    window.sessionStorage.setItem("redirectTimer", redirectTimer.toString());
   } catch (err) {
     error.value =
       err instanceof Error ? err.message : "Failed to update transaction";
@@ -706,5 +714,17 @@ async function updateTransaction() {
   } finally {
     loading.value = false;
   }
+}
+
+// Function to redirect to the transactions page
+function goToTransactions() {
+  // Clear any existing redirect timer
+  const timerId = window.sessionStorage.getItem("redirectTimer");
+  if (timerId) {
+    clearTimeout(parseInt(timerId));
+    window.sessionStorage.removeItem("redirectTimer");
+  }
+
+  router.push("/dashboard/transaction");
 }
 </script>

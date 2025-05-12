@@ -140,3 +140,51 @@ export interface UITransaction {
   amount: number;
   date: string | Date;
 }
+
+/**
+ * Budget types
+ */
+export interface Budget {
+  id: string;
+  user_id: string;
+  category: string;
+  amount: number;
+  spent: number;
+  remaining: number;
+  month_year: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BudgetRequest {
+  category: string;
+  amount: number;
+  month_year: string;
+  notes?: string;
+}
+
+export interface BudgetResponse {
+  status: boolean;
+  message: string;
+  data: Budget;
+}
+
+export interface BudgetListResponse {
+  status: boolean;
+  message: string;
+  data: {
+    budgets: Budget[];
+  };
+}
+
+// UI-specific budget type for frontend display
+export interface UIBudget {
+  id: string;
+  category: string;
+  amount: number;
+  spent: number;
+  remaining: number;
+  month_year: string;
+  notes: string;
+}
