@@ -152,10 +152,9 @@
               ></path>
             </svg>
           </div>
-          <h3 class="text-lg font-medium text-gray-900">Budget Saved!</h3>
-          <p class="mt-2 text-sm text-gray-600">
-            Your budget has been successfully saved.
-          </p>
+          <h3 class="text-lg font-medium text-gray-900">
+            {{ successMessageText }}
+          </h3>
           <div class="mt-4">
             <button
               @click="hideSuccessMessage"
@@ -180,10 +179,16 @@ definePageMeta({
   layout: "dashboard",
 });
 
+// Helper function to format currency values
+function formatCurrency(amount: number): string {
+  return `Rp${amount.toLocaleString("id-ID")}`;
+}
+
 const budgetService = useBudgetService();
 const loading = ref(true);
 const error = ref("");
 const success = ref(false);
+const successMessageText = ref("Your budget has been successfully saved.");
 const summaryComponent = ref<InstanceType<typeof BudgetSummary> | null>(null);
 
 // Update to store both year and month
@@ -354,6 +359,13 @@ async function saveBudget(budgetFormData: any) {
       notes: budgetFormData.notes || "",
     };
 
+    // Check if we already have a budget for this category and month-year
+    const existingBudget = budgetData.value.find(
+      (b) =>
+        b.category === budgetFormData.category &&
+        b.month_year === budgetFormData.yearMonth
+    );
+
     if (isEditing.value) {
       // Update existing budget
       const budget = budgetData.value.find(
@@ -377,11 +389,17 @@ async function saveBudget(budgetFormData: any) {
         budgetData.value[index] = response.data;
 
         // Show success message
+        successMessageText.value = `Budget for ${
+          budgetFormData.category
+        } updated! Amount increased by ${formatCurrency(
+          budgetFormData.amount
+        )}.`;
         success.value = true;
 
         // Auto-hide success message after 5 seconds if user doesn't click Continue
         const redirectTimer = setTimeout(() => {
           success.value = false;
+          successMessageText.value = "Your budget has been successfully saved."; // Reset to default
         }, 5000);
 
         // Store the timer so it can be cancelled if user clicks Continue
@@ -390,6 +408,44 @@ async function saveBudget(budgetFormData: any) {
           redirectTimer.toString()
         );
       }
+    } else if (existingBudget) {
+      // If creating a new budget but one already exists for this category and month-year,
+      // update the existing budget instead by adding the amounts
+      const updatedRequest = {
+        ...budgetRequest,
+        amount: existingBudget.amount + budgetRequest.amount,
+      };
+
+      const response = await budgetService.updateBudget(
+        existingBudget.id,
+        updatedRequest
+      );
+
+      // Update the local state with the response data
+      const index = budgetData.value.findIndex(
+        (b) => b.id === existingBudget.id
+      );
+      if (index !== -1) {
+        budgetData.value[index] = response.data;
+      }
+
+      // Show success message with update information
+      successMessageText.value = `Budget for ${
+        budgetFormData.category
+      } updated! Amount increased by ${formatCurrency(budgetFormData.amount)}.`;
+      success.value = true;
+
+      // Auto-hide success message after 5 seconds if user doesn't click Continue
+      const redirectTimer = setTimeout(() => {
+        success.value = false;
+        successMessageText.value = "Your budget has been successfully saved."; // Reset to default
+      }, 5000);
+
+      // Store the timer so it can be cancelled if user clicks Continue
+      window.sessionStorage.setItem(
+        "budgetRedirectTimer",
+        redirectTimer.toString()
+      );
     } else {
       // Create new budget
       const response = await budgetService.createBudget(budgetRequest);
@@ -398,6 +454,7 @@ async function saveBudget(budgetFormData: any) {
       budgetData.value.push(response.data);
 
       // Show success message
+      successMessageText.value = "Your budget has been successfully saved.";
       success.value = true;
 
       // Auto-hide success message after 5 seconds if user doesn't click Continue
