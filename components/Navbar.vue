@@ -23,10 +23,10 @@
             Dashboard
           </NuxtLink>
           <NuxtLink
-            to="/transaction"
+            to="/dashboard/transaction"
             class="px-3 py-2 text-sm font-medium transition-colors"
             :class="[
-              $route.path === '/transaction'
+              $route.path === '/dashboard/transaction'
                 ? 'text-green-500'
                 : 'text-gray-700 hover:text-green-500',
             ]"
@@ -34,10 +34,10 @@
             Transaction
           </NuxtLink>
           <NuxtLink
-            to="/budget"
+            to="/dashboard/budget"
             class="px-3 py-2 text-sm font-medium transition-colors"
             :class="[
-              $route.path === '/budget'
+              $route.path === '/dashboard/budget'
                 ? 'text-green-500'
                 : 'text-gray-700 hover:text-green-500',
             ]"
@@ -45,10 +45,10 @@
             Budget
           </NuxtLink>
           <NuxtLink
-            to="/challenges"
+            to="/dashboard/challenges"
             class="px-3 py-2 text-sm font-medium transition-colors"
             :class="[
-              $route.path === '/challenges'
+              $route.path === '/dashboard/challenges'
                 ? 'text-green-500'
                 : 'text-gray-700 hover:text-green-500',
             ]"
@@ -58,10 +58,10 @@
 
           <!-- Profile link -->
           <NuxtLink
-            to="/profile"
+            to="/dashboard/profile"
             class="flex items-center px-3 py-2 text-sm font-medium transition-colors"
             :class="[
-              $route.path === '/profile'
+              $route.path === '/dashboard/profile'
                 ? 'text-green-500'
                 : 'text-gray-700 hover:text-green-500',
             ]"
