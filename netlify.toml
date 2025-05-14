@@ -8,7 +8,7 @@
 [build.environment]
   NITRO_PRESET = "netlify"
   NODE_VERSION = "20"
-  NUXT_PUBLIC_API_BASE_URL = "https://your-api-url.com"
+  # NUXT_PUBLIC_API_BASE_URL = "https://your-api-url.com"
 
 [[redirects]]
   from = "/*"
