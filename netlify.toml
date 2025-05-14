@@ -1,10 +1,16 @@
-# [build]
-#   command = "npm run generate"
-#   publish = ".dist"
+[build]
+  command = "npm run build"
+  publish = "dist"
 
-# # [functions]
-#   # directory = ".output/server"
+[functions]
+  directory = ".output/server"
 
-# # [build.environment]
-# #   NITRO_PRESET = "netlify"
-#   # NODE_VERSION = "18"
+[build.environment]
+  NITRO_PRESET = "netlify"
+  NODE_VERSION = "20"
+  NUXT_PUBLIC_API_BASE_URL = "https://your-api-url.com"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
