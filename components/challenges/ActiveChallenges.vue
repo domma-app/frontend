@@ -80,7 +80,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
 import ActiveChallengeItem from "./ActiveChallengeItem.vue";
 
 interface Challenge {
