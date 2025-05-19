@@ -46,7 +46,7 @@ export class ChallengeService {
   /**
    * Get a specific challenge
    */
-  async getChallenge(id: string | number): Promise<ChallengeResponse> {
+  async getChallenge(id: string | string[]): Promise<ChallengeResponse> {
     const response = await this.apiClient.get<ChallengeResponse>(
       `${this.ENDPOINTS.CHALLENGE}/${id}`
     );
