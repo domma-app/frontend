@@ -7,11 +7,87 @@
       @check-in="handleChallengeCheckIn"
     />
 
-    <ChallengeCatalog
-      :challenges="catalogChallenges"
-      @join="joinChallenge"
-      @browse-more="handleBrowseMore"
-    />
+    <!-- Featured Challenges -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden mt-6">
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex justify-between items-center">
+          <h2 class="text-lg font-medium text-gray-800">Featured Challenges</h2>
+          <NuxtLink
+            to="/dashboard/challenges/browse"
+            class="text-sm text-green-600 hover:text-green-700 font-medium"
+          >
+            View All Challenges
+          </NuxtLink>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- Loading State -->
+        <div v-if="isLoading" class="text-center py-8">
+          <svg
+            class="animate-spin h-8 w-8 mx-auto text-green-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="mt-2 text-sm text-gray-600">Loading challenges...</p>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="text-center py-8">
+          <svg
+            class="mx-auto h-12 w-12 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">{{ error }}</h3>
+          <div class="mt-6">
+            <button
+              @click="fetchChallenges"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+
+        <!-- Challenge Cards -->
+        <div
+          v-else
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+        >
+          <ChallengeCard
+            v-for="challenge in challenges"
+            :key="challenge.id"
+            :challenge="challenge"
+            @join="joinChallenge"
+          />
+        </div>
+      </div>
+    </div>
 
     <JoinChallengeModal
       :show="showJoinChallengeModal"
@@ -32,13 +108,68 @@
 
 <script setup lang="ts">
 import ActiveChallenges from "~/components/challenges/ActiveChallenges.vue";
-import ChallengeCatalog from "~/components/challenges/ChallengeCatalog.vue";
+import ChallengeCard from "~/components/challenges/ChallengeCard.vue";
 import ChallengeHeader from "~/components/challenges/ChallengeHeader.vue";
 import JoinChallengeModal from "~/components/challenges/JoinChallengeModal.vue";
 import CheckInModal from "~/components/challenges/CheckInModal.vue";
+import { useChallengeService } from "~/services/api/challenge";
+import type { UiChallenge } from "~/types/api";
 
 definePageMeta({
   layout: "dashboard",
+});
+
+// Use the challenge service for API calls
+const challengeService = useChallengeService();
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+
+// Initialize challenges with an empty array
+const challenges = ref<UiChallenge[]>([]);
+
+// Fetch challenges from the API
+async function fetchChallenges() {
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const response = await challengeService.getChallenges(1, 3); // Get first page with 3 items
+    if (response && response.data) {
+      // Map API response to the format expected by the UI
+      challenges.value = response.data.map((challenge) => {
+        return {
+          id: challenge.id,
+          title: challenge.title,
+          description: challenge.description,
+          duration: `${challenge.total_days} Days`,
+          difficulty: challenge.difficulty,
+          category:
+            challenge.type === "saving"
+              ? "Saving"
+              : challenge.type === "spending"
+              ? "Spending Control"
+              : challenge.type === "habit"
+              ? "Habit"
+              : "Default",
+          features: challenge.features,
+          targetText: challenge.targetText,
+          color: challenge.color,
+        };
+      });
+    } else {
+      error.value = "Failed to load challenges";
+    }
+  } catch (err) {
+    console.error("Error fetching challenges:", err);
+    error.value = "Failed to load challenges. Please try again later.";
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Fetch challenges when component mounts
+onMounted(() => {
+  fetchChallenges();
 });
 
 interface ActiveChallenge {

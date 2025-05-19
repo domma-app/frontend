@@ -101,8 +101,7 @@
               <option value="">Category (All)</option>
               <option value="saving">Saving</option>
               <option value="spending">Spending Control</option>
-              <option value="investing">Investing</option>
-              <option value="financial-literacy">Financial Literacy</option>
+              <option value="habit">Habit</option>
             </select>
           </div>
 
@@ -172,103 +171,14 @@
         <!-- Challenge Cards -->
         <div
           v-else-if="filteredChallenges.length > 0"
-          class="grid grid-cols-1 md:grid-cols-3 gap-6"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
-          <div
+          <ChallengeCard
             v-for="challenge in filteredChallenges"
             :key="challenge.id"
-            class="border border-gray-200 rounded-lg overflow-hidden flex flex-col"
-          >
-            <div :class="`bg-${getSafeColor(challenge.color)}-50 p-4`">
-              <div class="flex justify-between">
-                <h3 class="text-lg font-medium text-gray-800">
-                  {{ challenge.title }}
-                </h3>
-                <div class="flex">
-                  <span
-                    v-for="i in 5"
-                    :key="i"
-                    :class="`w-4 h-4 ${
-                      i <= challenge.difficulty
-                        ? 'text-yellow-400'
-                        : 'text-gray-300'
-                    }`"
-                  >
-                    ★
-                  </span>
-                </div>
-              </div>
-              <p class="text-sm text-gray-600 mt-1">
-                {{ challenge.description }}
-              </p>
-              <div class="mt-2 flex items-center">
-                <span
-                  :class="`bg-${getSafeColor(
-                    challenge.color
-                  )}-100 text-${getSafeColor(
-                    challenge.color
-                  )}-800 text-xs px-2 py-1 rounded-full mr-2`"
-                >
-                  {{ challenge.duration }}
-                </span>
-                <span
-                  class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full"
-                >
-                  {{ challenge.category }}
-                </span>
-              </div>
-            </div>
-
-            <div class="p-4 flex-1">
-              <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li
-                  v-for="(feature, index) in challenge.features.slice(0, 3)"
-                  :key="index"
-                  class="flex items-start"
-                >
-                  <svg
-                    class="w-4 h-4 text-green-500 mr-2 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    ></path>
-                  </svg>
-                  {{ feature }}
-                </li>
-              </ul>
-
-              <div class="flex items-center justify-between mt-auto">
-                <p class="font-medium text-gray-800">
-                  {{ challenge.targetText }}
-                </p>
-                <div class="flex space-x-2">
-                  <NuxtLink
-                    :to="`/dashboard/challenges/${challenge.id}`"
-                    class="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded transition-colors text-sm"
-                  >
-                    Details
-                  </NuxtLink>
-                  <button
-                    @click="joinChallenge(challenge.title)"
-                    :class="`px-3 py-1 bg-${getSafeColor(
-                      challenge.color
-                    )}-500 hover:bg-${getSafeColor(
-                      challenge.color
-                    )}-600 text-white rounded transition-colors text-sm`"
-                  >
-                    Join
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+            :challenge="challenge"
+            @join="joinChallenge"
+          />
         </div>
 
         <!-- Empty State -->
@@ -310,6 +220,7 @@
 <script setup lang="ts">
 import { useChallengeService } from "~/services/api/challenge";
 import type { UiChallenge } from "~/types/api";
+import ChallengeCard from "~/components/challenges/ChallengeCard.vue";
 
 definePageMeta({
   layout: "dashboard",
@@ -386,9 +297,9 @@ async function fetchChallenges() {
   try {
     const response = await challengeService.getChallenges();
 
-    if (response.status && response.data && response.data.challenges) {
+    if (response && response.data) {
       // Map API response to the format expected by the UI
-      challenges.value = response.data.challenges.map((challenge) => {
+      challenges.value = response.data.map((challenge) => {
         return {
           id: challenge.id,
           title: challenge.title,
@@ -399,7 +310,7 @@ async function fetchChallenges() {
             challenge.type === "saving"
               ? "Saving"
               : challenge.type === "spending"
-              ? "Spending"
+              ? "Spending Control"
               : challenge.type === "habit"
               ? "Habit"
               : "Default",

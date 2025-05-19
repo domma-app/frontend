@@ -18,11 +18,23 @@ export class ChallengeService {
 
   /**
    * Get all challenges
+   * @param page Optional page number for pagination
+   * @param limit Optional limit of items per page
    */
-  async getChallenges(): Promise<ChallengeListResponse> {
-    const response = await this.apiClient.get<ChallengeListResponse>(
-      this.ENDPOINTS.CHALLENGE
-    );
+  async getChallenges(
+    page?: number,
+    limit?: number
+  ): Promise<ChallengeListResponse> {
+    const queryParams = new URLSearchParams();
+    if (page !== undefined) queryParams.append("page", page.toString());
+    if (limit !== undefined) queryParams.append("limit", limit.toString());
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString
+      ? `${this.ENDPOINTS.CHALLENGE}?${queryString}`
+      : this.ENDPOINTS.CHALLENGE;
+
+    const response = await this.apiClient.get<ChallengeListResponse>(endpoint);
 
     if (response.error) {
       throw new Error(response.error.message);

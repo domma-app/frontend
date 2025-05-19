@@ -232,9 +232,7 @@ export interface ChallengeResponse {
 export interface ChallengeListResponse {
   status: boolean;
   message: string;
-  data: {
-    challenges: Challenge[];
-  };
+  data: Challenge[];
 }
 
 export interface ChallengeDeleteResponse {
