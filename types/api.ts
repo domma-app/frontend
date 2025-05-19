@@ -206,3 +206,51 @@ export interface UIBudget {
   month_year: string;
   notes: string;
 }
+
+/**
+ * Challenge types
+ */
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  total_days: number;
+  target_amount: number;
+  color: string;
+  difficulty: number;
+  type: string;
+  targetText: string;
+  features: string[];
+}
+
+export interface ChallengeResponse {
+  status: boolean;
+  message: string;
+  data: Challenge;
+}
+
+export interface ChallengeListResponse {
+  status: boolean;
+  message: string;
+  data: {
+    challenges: Challenge[];
+  };
+}
+
+export interface ChallengeDeleteResponse {
+  status: boolean;
+  message: string;
+}
+
+// UI-specific challenge type for frontend display
+export interface UiChallenge {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  difficulty: number;
+  category: string;
+  features: string[];
+  targetText: string;
+  color: string;
+}

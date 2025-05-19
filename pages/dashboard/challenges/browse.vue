@@ -117,9 +117,61 @@
       </div>
 
       <div class="p-6">
+        <!-- Loading State -->
+        <div v-if="isLoading" class="text-center py-8">
+          <svg
+            class="animate-spin h-8 w-8 mx-auto text-green-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="mt-2 text-sm text-gray-600">Loading challenges...</p>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="text-center py-8">
+          <svg
+            class="mx-auto h-12 w-12 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">{{ error }}</h3>
+          <div class="mt-6">
+            <button
+              @click="fetchChallenges"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+
         <!-- Challenge Cards -->
         <div
-          v-if="filteredChallenges.length > 0"
+          v-else-if="filteredChallenges.length > 0"
           class="grid grid-cols-1 md:grid-cols-3 gap-6"
         >
           <div
@@ -127,7 +179,7 @@
             :key="challenge.id"
             class="border border-gray-200 rounded-lg overflow-hidden flex flex-col"
           >
-            <div :class="`bg-${challenge.color}-50 p-4`">
+            <div :class="`bg-${getSafeColor(challenge.color)}-50 p-4`">
               <div class="flex justify-between">
                 <h3 class="text-lg font-medium text-gray-800">
                   {{ challenge.title }}
@@ -151,7 +203,11 @@
               </p>
               <div class="mt-2 flex items-center">
                 <span
-                  :class="`bg-${challenge.color}-100 text-${challenge.color}-800 text-xs px-2 py-1 rounded-full mr-2`"
+                  :class="`bg-${getSafeColor(
+                    challenge.color
+                  )}-100 text-${getSafeColor(
+                    challenge.color
+                  )}-800 text-xs px-2 py-1 rounded-full mr-2`"
                 >
                   {{ challenge.duration }}
                 </span>
@@ -201,7 +257,11 @@
                   </NuxtLink>
                   <button
                     @click="joinChallenge(challenge.title)"
-                    :class="`px-3 py-1 bg-${challenge.color}-500 hover:bg-${challenge.color}-600 text-white rounded transition-colors text-sm`"
+                    :class="`px-3 py-1 bg-${getSafeColor(
+                      challenge.color
+                    )}-500 hover:bg-${getSafeColor(
+                      challenge.color
+                    )}-600 text-white rounded transition-colors text-sm`"
                   >
                     Join
                   </button>
@@ -248,159 +308,121 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { useChallengeService } from "~/services/api/challenge";
+import type { UiChallenge } from "~/types/api";
 
 definePageMeta({
   layout: "dashboard",
 });
 
-// Sample data - later, this would be fetched from an API
-const challenges = ref([
-  {
-    id: 1,
-    title: "30-Day No Eating Out",
-    description: "Cook all your meals at home for 30 days",
-    duration: "30 Days",
-    difficulty: 3,
-    category: "Spending Control",
-    features: [
-      "Track daily spending on food",
-      "Cook all meals at home",
-      "Save receipts for grocery shopping",
-      "Calculate your total savings",
-    ],
-    targetText: "Avg. Savings: Rp300.000",
-    color: "green",
-  },
-  {
-    id: 2,
-    title: "52-Week Savings",
-    description: "Save an increasing amount each week for a year",
-    duration: "1 Year",
-    difficulty: 2,
-    category: "Saving",
-    features: [
-      "Week 1: Save Rp5.000",
-      "Week 2: Save Rp10.000",
-      "Increase by Rp5.000 each week",
-      "Build a savings habit gradually",
-    ],
-    targetText: "Total: ~Rp7.000.000",
-    color: "blue",
-  },
-  {
-    id: 3,
-    title: "30-Day Rp5.000 Challenge",
-    description: "Save Rp5.000 every day for a month",
-    duration: "30 Days",
-    difficulty: 1,
-    category: "Saving",
-    features: [
-      "Put away Rp5.000 each day",
-      "Save Rp150.000 in just one month",
-      "Perfect for beginners",
-      "Build a daily saving habit",
-    ],
-    targetText: "Target: Rp150.000",
-    color: "purple",
-  },
-  {
-    id: 4,
-    title: "No Spend Weekend",
-    description: "Commit to spending Rp0 for an entire weekend",
-    duration: "2 Days",
-    difficulty: 3,
-    category: "Spending Control",
-    features: [
-      "No discretionary spending for 48 hours",
-      "Break the impulse spending habit",
-      "Do this challenge once a month",
-      "Plan activities that don't cost money",
-    ],
-    targetText: "Est. Savings: Rp50.000+",
-    color: "amber",
-  },
-  {
-    id: 5,
-    title: "1% More Savings",
-    description: "Increase your monthly savings rate by 1%",
-    duration: "3 Months",
-    difficulty: 2,
-    category: "Saving",
-    features: [
-      "Start with just 1% of your income",
-      "Add another 1% each month",
-      "Build sustainable saving habits",
-      "Track your savings growth",
-    ],
-    targetText: "3-month challenge",
-    color: "emerald",
-  },
-  {
-    id: 6,
-    title: "Investing Basics",
-    description: "Learn and implement investing fundamentals",
-    duration: "30 Days",
-    difficulty: 4,
-    category: "Investing",
-    features: [
-      "Daily educational content",
-      "Set up your first investment",
-      "Learn risk management",
-      "Track market movements",
-    ],
-    targetText: "Investment Knowledge",
-    color: "teal",
-  },
-  {
-    id: 7,
-    title: "Cash-Only Month",
-    description: "Use only cash for all purchases for a month",
-    duration: "30 Days",
-    difficulty: 4,
-    category: "Spending Control",
-    features: [
-      "No credit/debit cards",
-      "Plan cash withdrawals",
-      "Envelope budgeting system",
-      "Track every expense",
-    ],
-    targetText: "Improved Spending Awareness",
-    color: "orange",
-  },
-  {
-    id: 8,
-    title: "Financial Literacy",
-    description: "Complete daily financial education tasks",
-    duration: "21 Days",
-    difficulty: 2,
-    category: "Financial-Literacy",
-    features: [
-      "Daily reading assignments",
-      "Video lessons",
-      "Practice financial calculations",
-      "Create a personal financial plan",
-    ],
-    targetText: "Financial Knowledge",
-    color: "indigo",
-  },
-  {
-    id: 9,
-    title: "Emergency Fund Builder",
-    description: "Build your 3-month emergency fund",
-    duration: "6 Months",
-    difficulty: 3,
-    category: "Saving",
-    features: [
-      "Calculate your monthly expenses",
-      "Set up automatic transfers",
-      "Cut unnecessary expenses",
-      "Build a financial safety net",
-    ],
-    targetText: "3-Month Expense Buffer",
-    color: "rose",
-  },
-]);
+// Define type for valid Tailwind colors
+type TailwindColor =
+  | "slate"
+  | "gray"
+  | "zinc"
+  | "neutral"
+  | "stone"
+  | "red"
+  | "orange"
+  | "amber"
+  | "yellow"
+  | "lime"
+  | "green"
+  | "emerald"
+  | "teal"
+  | "cyan"
+  | "sky"
+  | "blue"
+  | "indigo"
+  | "violet"
+  | "purple"
+  | "fuchsia"
+  | "pink"
+  | "rose";
+
+// Function to get safe Tailwind color
+function getSafeColor(color: string): TailwindColor {
+  const validColors: Record<string, TailwindColor> = {
+    slate: "slate",
+    gray: "gray",
+    zinc: "zinc",
+    neutral: "neutral",
+    stone: "stone",
+    red: "red",
+    orange: "orange",
+    amber: "amber",
+    yellow: "yellow",
+    lime: "lime",
+    green: "green",
+    emerald: "emerald",
+    teal: "teal",
+    cyan: "cyan",
+    sky: "sky",
+    blue: "blue",
+    indigo: "indigo",
+    violet: "violet",
+    purple: "purple",
+    fuchsia: "fuchsia",
+    pink: "pink",
+    rose: "rose",
+  };
+
+  return validColors[color] || "blue";
+}
+
+// Use the challenge service for API calls
+const challengeService = useChallengeService();
+const isLoading = ref(false);
+const error = ref<string | null>(null);
+
+// Initialize challenges with an empty array
+const challenges = ref<UiChallenge[]>([]);
+
+// Fetch challenges from the API
+async function fetchChallenges() {
+  isLoading.value = true;
+  error.value = null;
+
+  try {
+    const response = await challengeService.getChallenges();
+
+    if (response.status && response.data && response.data.challenges) {
+      // Map API response to the format expected by the UI
+      challenges.value = response.data.challenges.map((challenge) => {
+        return {
+          id: challenge.id,
+          title: challenge.title,
+          description: challenge.description,
+          duration: `${challenge.total_days} Days`,
+          difficulty: challenge.difficulty,
+          category:
+            challenge.type === "saving"
+              ? "Saving"
+              : challenge.type === "spending"
+              ? "Spending"
+              : challenge.type === "habit"
+              ? "Habit"
+              : "Default",
+          features: challenge.features,
+          targetText: challenge.targetText,
+          color: challenge.color,
+        };
+      });
+    } else {
+      error.value = "Failed to load challenges";
+    }
+  } catch (err) {
+    console.error("Error fetching challenges:", err);
+    error.value = "Failed to load challenges. Please try again later.";
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+// Fetch challenges when component mounts
+onMounted(() => {
+  fetchChallenges();
+});
 
 // Filter state
 const searchQuery = ref("");
@@ -490,3 +512,31 @@ const filteredChallenges = computed(() => {
   return result;
 });
 </script>
+
+<style>
+/* 
+  Safelist for Tailwind to include all color variations:
+  bg-slate-50 bg-slate-100 bg-slate-500 bg-slate-600 text-slate-800
+  bg-gray-50 bg-gray-100 bg-gray-500 bg-gray-600 text-gray-800
+  bg-zinc-50 bg-zinc-100 bg-zinc-500 bg-zinc-600 text-zinc-800
+  bg-neutral-50 bg-neutral-100 bg-neutral-500 bg-neutral-600 text-neutral-800
+  bg-stone-50 bg-stone-100 bg-stone-500 bg-stone-600 text-stone-800
+  bg-red-50 bg-red-100 bg-red-500 bg-red-600 text-red-800
+  bg-orange-50 bg-orange-100 bg-orange-500 bg-orange-600 text-orange-800
+  bg-amber-50 bg-amber-100 bg-amber-500 bg-amber-600 text-amber-800
+  bg-yellow-50 bg-yellow-100 bg-yellow-500 bg-yellow-600 text-yellow-800
+  bg-lime-50 bg-lime-100 bg-lime-500 bg-lime-600 text-lime-800
+  bg-green-50 bg-green-100 bg-green-500 bg-green-600 text-green-800
+  bg-emerald-50 bg-emerald-100 bg-emerald-500 bg-emerald-600 text-emerald-800
+  bg-teal-50 bg-teal-100 bg-teal-500 bg-teal-600 text-teal-800
+  bg-cyan-50 bg-cyan-100 bg-cyan-500 bg-cyan-600 text-cyan-800
+  bg-sky-50 bg-sky-100 bg-sky-500 bg-sky-600 text-sky-800
+  bg-blue-50 bg-blue-100 bg-blue-500 bg-blue-600 text-blue-800
+  bg-indigo-50 bg-indigo-100 bg-indigo-500 bg-indigo-600 text-indigo-800
+  bg-violet-50 bg-violet-100 bg-violet-500 bg-violet-600 text-violet-800
+  bg-purple-50 bg-purple-100 bg-purple-500 bg-purple-600 text-purple-800
+  bg-fuchsia-50 bg-fuchsia-100 bg-fuchsia-500 bg-fuchsia-600 text-fuchsia-800
+  bg-pink-50 bg-pink-100 bg-pink-500 bg-pink-600 text-pink-800
+  bg-rose-50 bg-rose-100 bg-rose-500 bg-rose-600 text-rose-800
+*/
+</style>
