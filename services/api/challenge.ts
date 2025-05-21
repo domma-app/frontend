@@ -1,5 +1,13 @@
 import { useApiClient } from "./client";
-import type { ChallengeListResponse, ChallengeResponse, ActiveChallengesResponse } from "~/types/api";
+import type {
+  ChallengeListResponse,
+  ChallengeResponse,
+  ActiveChallengesResponse,
+  ChallengeJoinRequest,
+  ChallengeJoinResponse,
+  ChallengeCheckInRequest,
+  ChallengeCheckInResponse,
+} from "~/types/api";
 
 /**
  * Challenge service for managing challenges
@@ -9,6 +17,8 @@ export class ChallengeService {
     CHALLENGE: "/challenges",
     SUMMARY: "/challenges/summary",
     ACTIVE: "/challenges/active",
+    JOIN: "/challenges/join",
+    CHECK_IN: "/challenges",
   };
 
   private apiClient;
@@ -72,6 +82,46 @@ export class ChallengeService {
     }
 
     return response.data as ActiveChallengesResponse;
+  }
+
+  /**
+   * Join a challenge
+   * @param joinRequest The join request data
+   */
+  async joinChallenge(
+    joinRequest: ChallengeJoinRequest
+  ): Promise<ChallengeJoinResponse> {
+    const response = await this.apiClient.post<ChallengeJoinResponse>(
+      this.ENDPOINTS.JOIN,
+      joinRequest
+    );
+
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    return response.data as ChallengeJoinResponse;
+  }
+
+  /**
+   * Check in to an active challenge
+   * @param challengeId The ID of the challenge to check in to
+   * @param checkInData The check-in data
+   */
+  async checkInChallenge(
+    challengeId: string,
+    checkInData: ChallengeCheckInRequest
+  ): Promise<ChallengeCheckInResponse> {
+    const response = await this.apiClient.post<ChallengeCheckInResponse>(
+      `${this.ENDPOINTS.CHALLENGE}/${challengeId}/check-in`,
+      checkInData
+    );
+
+    if (response.error) {
+      throw new Error(response.error.message);
+    }
+
+    return response.data as ChallengeCheckInResponse;
   }
 }
 

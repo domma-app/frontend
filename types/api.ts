@@ -243,6 +243,7 @@ export interface ChallengeDeleteResponse {
 // UI-specific challenge type for frontend display
 export interface UiChallenge {
   id: string;
+  challenge_id: string;
   title: string;
   description: string;
   duration: string;
@@ -258,6 +259,7 @@ export interface UiChallenge {
  */
 export interface ActiveChallenge {
   id: string;
+  challenge_id: string;
   title: string;
   description: string;
   progress: string;
@@ -274,6 +276,21 @@ export interface ActiveChallenge {
   status: string;
   startDate: string;
   endDate: string;
+  features?: string[];
+  steps?: string[];
+  tips?: string[];
+  activityLog?: ChallengeActivity[];
+}
+
+export interface ChallengeActivity {
+  id: string;
+  action: string;
+  date: string;
+  amount?: number;
+  completed?: boolean;
+  difficulty?: number;
+  notes?: string;
+  shared?: boolean;
 }
 
 export interface ActiveChallengesResponse {
@@ -287,4 +304,37 @@ export interface ActiveChallengesResponse {
     totalPages: number;
     currentPage: number;
   };
+}
+
+/**
+ * Challenge Join Request/Response
+ */
+export interface ChallengeJoinRequest {
+  challenge_id: string;
+  goal: string;
+  start_date: string;
+}
+
+export interface ChallengeJoinResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge;
+}
+
+/**
+ * Challenge Check-In Request/Response
+ */
+export interface ChallengeCheckInRequest {
+  date: string;
+  amount?: number;
+  completed?: boolean;
+  difficulty: number;
+  notes?: string;
+  shareProgress: boolean;
+}
+
+export interface ChallengeCheckInResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge;
 }

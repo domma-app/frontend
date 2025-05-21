@@ -68,18 +68,15 @@
         </div>
 
         <!-- Active Challenges -->
-        <div
-          v-else-if="activeChallenges.length === 0"
-          class="text-center text-gray-500 py-4"
-        >
-          You don't have any active challenges. Join a challenge to get started.
-        </div>
+        <div v-if="!isLoadingActive && !activeError">
+          <!-- <div class="flex justify-between items-center">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">
+              Your Active Challenges
+            </h2>
+          </div> -->
 
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ActiveChallengeItem
-            v-for="challenge in activeChallenges"
-            :key="challenge.id"
-            :challenge="challenge"
+          <ActiveChallenges
+            :challenges="activeChallenges"
             @check-in="handleChallengeCheckIn"
           />
         </div>
@@ -159,9 +156,10 @@
           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
           <ChallengeCard
-            v-for="challenge in challenges"
+            v-for="challenge in filteredChallenges"
             :key="challenge.id"
             :challenge="challenge"
+            :isJoined="isJoined(challenge.challenge_id)"
             @join="joinChallenge"
           />
         </div>
@@ -172,6 +170,7 @@
       :show="showJoinChallengeModal"
       :initial-challenge-name="selectedChallenge"
       :challenge-options="challengeOptions"
+      :selected-challenge-id="joinModalSelectedChallengeId"
       @close="showJoinChallengeModal = false"
       @submit="submitJoinChallenge"
     />
@@ -193,6 +192,7 @@ import JoinChallengeModal from "~/components/challenges/JoinChallengeModal.vue";
 import CheckInModal from "~/components/challenges/CheckInModal.vue";
 import { useChallengeService } from "~/services/api/challenge";
 import type { UiChallenge, ActiveChallenge } from "~/types/api";
+import ActiveChallenges from "~/components/challenges/ActiveChallenges.vue";
 
 definePageMeta({
   layout: "dashboard",
@@ -206,6 +206,11 @@ const error = ref<string | null>(null);
 // Initialize challenges with an empty array
 const challenges = ref<UiChallenge[]>([]);
 
+// Featured challenges
+const filteredChallenges = computed(() => {
+  return challenges.value;
+});
+
 // Fetch challenges from the API
 async function fetchChallenges() {
   isLoading.value = true;
@@ -218,6 +223,7 @@ async function fetchChallenges() {
       challenges.value = response.data.map((challenge) => {
         return {
           id: challenge.id,
+          challenge_id: challenge.id,
           title: challenge.title,
           description: challenge.description,
           duration: `${challenge.total_days} Days`,
@@ -312,6 +318,22 @@ const activeChallenges = ref<ActiveChallenge[]>([]);
 const isLoadingActive = ref(false);
 const activeError = ref<string | null>(null);
 
+// Loading and error states for join and check-in
+const isLoadingJoin = ref(false);
+const joinError = ref<string | null>(null);
+const isLoadingCheckIn = ref(false);
+const checkInError = ref<string | null>(null);
+
+// Selected challenge ID for join modal
+const joinModalSelectedChallengeId = ref<string>("");
+
+// Check if a challenge is already joined
+function isJoined(challengeId: string): boolean {
+  return activeChallenges.value.some(
+    (challenge) => challenge.challenge_id === challengeId
+  );
+}
+
 // Fetch active challenges from the API
 async function fetchActiveChallenges() {
   isLoadingActive.value = true;
@@ -325,6 +347,7 @@ async function fetchActiveChallenges() {
       activeChallenges.value = response.data.map((challenge) => {
         return {
           id: challenge.id,
+          challenge_id: challenge.challenge_id,
           title: challenge.title,
           description: challenge.description,
           progress: challenge.progress,
@@ -341,6 +364,8 @@ async function fetchActiveChallenges() {
           status: challenge.status,
           startDate: challenge.startDate,
           endDate: challenge.endDate,
+          features: challenge.features || [],
+          activityLog: challenge.activityLog || [],
         };
       });
     } else {
@@ -355,49 +380,6 @@ async function fetchActiveChallenges() {
   }
 }
 
-// Mock data for catalog challenges
-const catalogChallenges = ref<CatalogChallenge[]>([
-  {
-    id: 1,
-    title: "30-Day Rp5.000 Challenge",
-    description: "Save Rp5.000 every day for a month",
-    features: [
-      "Put away Rp5.000 each day",
-      "Save Rp150.000 in just one month",
-      "Perfect for beginners",
-    ],
-    targetText: "Target: Rp150.000",
-    color: "purple",
-    type: "saving",
-  },
-  {
-    id: 2,
-    title: "No Spend Weekend",
-    description: "Commit to spending Rp0 for an entire weekend",
-    features: [
-      "No discretionary spending for 48 hours",
-      "Break the impulse spending habit",
-      "Do this challenge once a month",
-    ],
-    targetText: "Est. Savings: Rp50.000+",
-    color: "amber",
-    type: "spending",
-  },
-  {
-    id: 3,
-    title: "1% More Savings",
-    description: "Increase your monthly savings rate by 1%",
-    features: [
-      "Start with just 1% of your income",
-      "Add another 1% each month",
-      "Build sustainable saving habits",
-    ],
-    targetText: "3-month challenge",
-    color: "emerald",
-    type: "saving",
-  },
-]);
-
 // List of available challenges for the modal dropdown
 const challengeOptions = [
   "30-Day No Eating Out",
@@ -408,53 +390,44 @@ const challengeOptions = [
 ];
 
 // Event handlers
-function joinChallenge(challengeName: string): void {
+function joinChallenge(challengeName: string, challengeId: string): void {
   selectedChallenge.value = challengeName;
+  joinModalSelectedChallengeId.value = challengeId;
   showJoinChallengeModal.value = true;
 }
 
-function submitJoinChallenge(newChallenge: JoinChallengeForm): void {
-  // Later, this would call an API to join the challenge
-  console.log("Joining challenge:", newChallenge);
+function submitJoinChallenge(formData: any): void {
+  isLoadingJoin.value = true;
+  joinError.value = null;
 
-  // Show success notification
-  alert(`Successfully joined ${newChallenge.name}!`);
-
-  // Close modal
-  showJoinChallengeModal.value = false;
-
-  // Later, we would fetch the updated list of active challenges
-  // For now, we'll simulate adding this challenge to the active list
-  const newChallengeId = Math.floor(Math.random() * 10000).toString();
-
-  // Get challenge details from catalog if available
-  const catalogChallenge = catalogChallenges.value.find(
-    (c) => c.title === newChallenge.name
-  );
-
-  const newActiveChallenge = {
-    id: newChallengeId,
-    title: newChallenge.name,
-    description: catalogChallenge?.description || "",
-    progress: "Day 1/30", // This would be dynamic based on the challenge type
-    percentComplete: 3,
-    color: catalogChallenge?.color || "green",
-    savingsLabel: "Current Saved",
-    savingsAmount: 0,
-    actionText: "Check In",
-    type: catalogChallenge?.type || "saving", // Use the predefined type from catalog
-    checkInDescription: "Track your progress for today's challenge.",
-    duration: "30 Days",
-    difficulty: catalogChallenge?.difficulty || 1,
-    targetAmount: 0,
-    status: "active",
-    startDate: new Date().toISOString().split("T")[0],
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split("T")[0],
+  const joinRequest = {
+    challenge_id: formData.challenge_id || joinModalSelectedChallengeId.value,
+    goal: formData.goal || "Complete the challenge successfully",
+    start_date: formData.start_date,
   };
 
-  activeChallenges.value.push(newActiveChallenge);
+  // Call the API to join the challenge
+  challengeService
+    .joinChallenge(joinRequest)
+    .then((response) => {
+      if (response && response.data) {
+        // Add the newly joined challenge to the active challenges list
+        activeChallenges.value.push(response.data);
+
+        // Show success notification
+        alert(`Successfully joined ${response.data.title}!`);
+      }
+    })
+    .catch((err) => {
+      console.error("Error joining challenge:", err);
+      joinError.value =
+        err.message || "Failed to join challenge. Please try again.";
+      alert(`Error: ${joinError.value}`);
+    })
+    .finally(() => {
+      isLoadingJoin.value = false;
+      showJoinChallengeModal.value = false;
+    });
 }
 
 function handleChallengeCheckIn(id: string): void {
@@ -466,54 +439,47 @@ function handleChallengeCheckIn(id: string): void {
 }
 
 function submitChallengeCheckIn(data: CheckInData): void {
-  // Later, this would call an API to update the challenge progress
-  console.log("Check-in data:", data);
+  isLoadingCheckIn.value = true;
+  checkInError.value = null;
 
-  // Update local state to reflect the check-in
-  const challenge = activeChallenges.value.find(
-    (c) => c.id === data.challengeId
-  );
-  if (challenge) {
-    // Update progress - this would be more sophisticated in a real app
-    let currentProgress: number;
-    let totalProgress: number;
+  // Format the request according to API requirements
+  const checkInRequest = {
+    date: data.date,
+    amount: data.amount,
+    completed: data.completed,
+    difficulty: data.difficulty,
+    notes: data.notes,
+    shareProgress: data.shareProgress,
+  };
 
-    // Handle different progress formats (Day X/Y or Week X/Y)
-    if (challenge.progress.includes("Day")) {
-      currentProgress = parseInt(
-        challenge.progress.split("/")[0].replace("Day ", "")
-      );
-      totalProgress = parseInt(challenge.progress.split("/")[1]);
-    } else {
-      currentProgress = parseInt(
-        challenge.progress.split("/")[0].replace("Week ", "")
-      );
-      totalProgress = parseInt(challenge.progress.split("/")[1]);
-    }
+  // Call the API to check in
+  challengeService
+    .checkInChallenge(data.challengeId, checkInRequest)
+    .then((response) => {
+      if (response && response.data) {
+        // Find and update the challenge in our local array
+        const index = activeChallenges.value.findIndex(
+          (c) => c.id === data.challengeId
+        );
+        if (index !== -1) {
+          // Replace the challenge with the updated one from the API
+          activeChallenges.value[index] = response.data;
+        }
 
-    const newProgress = Math.min(currentProgress + 1, totalProgress);
-
-    // Format the progress string based on the original format
-    if (challenge.progress.includes("Day")) {
-      challenge.progress = `Day ${newProgress}/${totalProgress}`;
-    } else {
-      challenge.progress = `Week ${newProgress}/${totalProgress}`;
-    }
-
-    // Update percentage
-    challenge.percentComplete = Math.round((newProgress / totalProgress) * 100);
-
-    // Update savings amount if applicable
-    if (data.amount && data.amount > 0) {
-      challenge.savingsAmount += data.amount;
-    }
-  }
-
-  // Close modal
-  showCheckInModal.value = false;
-
-  // Show success notification
-  alert("Check-in successful! Your progress has been updated.");
+        // Show success notification
+        alert("Check-in successful! Your progress has been updated.");
+      }
+    })
+    .catch((err) => {
+      console.error("Error checking in:", err);
+      checkInError.value =
+        err.message || "Failed to check in. Please try again.";
+      alert(`Error: ${checkInError.value}`);
+    })
+    .finally(() => {
+      isLoadingCheckIn.value = false;
+      showCheckInModal.value = false;
+    });
 }
 
 function handleBrowseMore(): void {

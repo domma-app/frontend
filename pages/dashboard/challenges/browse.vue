@@ -117,7 +117,7 @@
 
       <div class="p-6">
         <!-- Loading State -->
-        <div v-if="isLoading" class="text-center py-8">
+        <div v-if="isLoading || isLoadingActive" class="text-center py-8">
           <svg
             class="animate-spin h-8 w-8 mx-auto text-green-500"
             xmlns="http://www.w3.org/2000/svg"
@@ -142,7 +142,7 @@
         </div>
 
         <!-- Error State -->
-        <div v-else-if="error" class="text-center py-8">
+        <div v-else-if="error || activeError" class="text-center py-8">
           <svg
             class="mx-auto h-12 w-12 text-red-500"
             fill="none"
@@ -157,10 +157,15 @@
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">{{ error }}</h3>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">
+            {{ error || activeError }}
+          </h3>
           <div class="mt-6">
             <button
-              @click="fetchChallenges"
+              @click="
+                fetchChallenges();
+                fetchActiveChallenges();
+              "
               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
             >
               Try Again
@@ -177,6 +182,7 @@
             v-for="challenge in filteredChallenges"
             :key="challenge.id"
             :challenge="challenge"
+            :isJoined="isJoined(challenge.challenge_id)"
             @join="joinChallenge"
           />
         </div>
@@ -214,13 +220,23 @@
         </div>
       </div>
     </div>
+
+    <JoinChallengeModal
+      :show="showJoinChallengeModal"
+      :initial-challenge-name="selectedChallenge"
+      :challenge-options="[]"
+      :selected-challenge-id="joinModalSelectedChallengeId"
+      @close="showJoinChallengeModal = false"
+      @submit="submitJoinChallenge"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useChallengeService } from "~/services/api/challenge";
-import type { UiChallenge } from "~/types/api";
+import type { UiChallenge, ActiveChallenge } from "~/types/api";
 import ChallengeCard from "~/components/challenges/ChallengeCard.vue";
+import JoinChallengeModal from "~/components/challenges/JoinChallengeModal.vue";
 
 definePageMeta({
   layout: "dashboard",
@@ -289,6 +305,23 @@ const error = ref<string | null>(null);
 // Initialize challenges with an empty array
 const challenges = ref<UiChallenge[]>([]);
 
+// Active challenges state
+const activeChallenges = ref<ActiveChallenge[]>([]);
+const isLoadingActive = ref(false);
+const activeError = ref<string | null>(null);
+
+// Check if a challenge is already joined
+function isJoined(challengeId: string): boolean {
+  return activeChallenges.value.some(
+    (challenge) => challenge.challenge_id === challengeId
+  );
+}
+
+// Join challenge modal state
+const showJoinChallengeModal = ref(false);
+const selectedChallenge = ref("");
+const joinModalSelectedChallengeId = ref<string>("");
+
 // Fetch challenges from the API
 async function fetchChallenges() {
   isLoading.value = true;
@@ -302,6 +335,7 @@ async function fetchChallenges() {
       challenges.value = response.data.map((challenge) => {
         return {
           id: challenge.id,
+          challenge_id: challenge.id,
           title: challenge.title,
           description: challenge.description,
           duration: `${challenge.total_days} Days`,
@@ -330,9 +364,55 @@ async function fetchChallenges() {
   }
 }
 
+// Fetch active challenges from the API
+async function fetchActiveChallenges() {
+  isLoadingActive.value = true;
+  activeError.value = null;
+
+  try {
+    const response = await challengeService.getActiveChallenges();
+
+    if (response && response.data) {
+      activeChallenges.value = response.data.map((challenge) => {
+        return {
+          id: challenge.id,
+          challenge_id: challenge.challenge_id,
+          title: challenge.title,
+          description: challenge.description,
+          progress: challenge.progress,
+          percentComplete: challenge.percentComplete,
+          color: challenge.color,
+          savingsLabel: challenge.savingsLabel || "",
+          savingsAmount: challenge.savingsAmount || 0,
+          actionText: challenge.actionText || "Check In",
+          type: challenge.type,
+          checkInDescription: challenge.checkInDescription || "",
+          duration: challenge.duration || "",
+          difficulty: challenge.difficulty || 1,
+          targetAmount: challenge.targetAmount || 0,
+          status: challenge.status || "active",
+          startDate: challenge.startDate || "",
+          endDate: challenge.endDate || "",
+          features: challenge.features || [],
+          activityLog: challenge.activityLog || [],
+        };
+      });
+    } else {
+      activeError.value = "Failed to load active challenges";
+    }
+  } catch (err) {
+    console.error("Error fetching active challenges:", err);
+    activeError.value =
+      "Failed to load active challenges. Please try again later.";
+  } finally {
+    isLoadingActive.value = false;
+  }
+}
+
 // Fetch challenges when component mounts
 onMounted(() => {
   fetchChallenges();
+  fetchActiveChallenges();
 });
 
 // Filter state
@@ -354,9 +434,41 @@ function resetFilters() {
 }
 
 // Join challenge function
-function joinChallenge(challengeName: string) {
-  console.log("Joining challenge:", challengeName);
-  // Later, this would show a join modal or redirect to join page
+function joinChallenge(challengeName: string, challengeId: string) {
+  selectedChallenge.value = challengeName;
+  joinModalSelectedChallengeId.value = challengeId;
+  showJoinChallengeModal.value = true;
+}
+
+// Submit join challenge
+function submitJoinChallenge(formData: any) {
+  const joinRequest = {
+    challenge_id: formData.challenge_id || joinModalSelectedChallengeId.value,
+    goal: formData.goal || "Complete the challenge successfully",
+    start_date: formData.start_date,
+  };
+
+  // Call the API to join the challenge
+  challengeService
+    .joinChallenge(joinRequest)
+    .then((response) => {
+      if (response && response.data) {
+        // Add the newly joined challenge to the active challenges list
+        activeChallenges.value.push(response.data);
+
+        // Show success notification
+        alert(`Successfully joined ${response.data.title}!`);
+      }
+    })
+    .catch((err) => {
+      console.error("Error joining challenge:", err);
+      alert(
+        `Error: ${err.message || "Failed to join challenge. Please try again."}`
+      );
+    })
+    .finally(() => {
+      showJoinChallengeModal.value = false;
+    });
 }
 
 // Computed filtered challenges

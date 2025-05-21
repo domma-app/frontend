@@ -221,8 +221,12 @@ const checkInData = ref({
 function handleSubmit() {
   emit("submit", {
     challengeId: props.challenge.id,
-    date: new Date().toISOString(),
-    ...checkInData.value,
+    date: new Date().toISOString().split("T")[0],
+    amount: checkInData.value.amount || undefined,
+    completed: checkInData.value.completed,
+    difficulty: checkInData.value.difficulty,
+    notes: checkInData.value.notes || undefined,
+    shareProgress: checkInData.value.shareProgress,
   });
 }
 

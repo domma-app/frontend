@@ -351,6 +351,43 @@
               </ul>
             </div>
 
+            <!-- Features Section for Active Participants -->
+            <div
+              v-if="userProgress.features && userProgress.features.length > 0"
+              class="mb-6"
+            >
+              <h3 class="text-lg font-medium text-gray-800 mb-3">
+                Challenge Features
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div
+                  v-for="(feature, index) in userProgress.features"
+                  :key="index"
+                  :class="`p-4 rounded-lg border border-gray-200 bg-${getSafeColor(
+                    challenge.color
+                  )}-50`"
+                >
+                  <div class="flex items-start">
+                    <svg
+                      class="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M5 13l4 4L19 7"
+                      ></path>
+                    </svg>
+                    <p class="text-gray-700">{{ feature }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Activity Log for Participants -->
             <div
               v-if="
@@ -423,6 +460,7 @@
       :show="showJoinModal"
       :initial-challenge-name="challenge.title"
       :challenge-options="[]"
+      :selected-challenge-id="joinModalSelectedChallengeId"
       @close="showJoinModal = false"
       @submit="handleJoinChallenge"
     />
@@ -434,6 +472,7 @@ import { ref, onMounted, computed } from "vue";
 import CheckInModal from "~/components/challenges/CheckInModal.vue";
 import JoinChallengeModal from "~/components/challenges/JoinChallengeModal.vue";
 import { useChallengeService } from "~/services/api/challenge";
+import type { ChallengeActivity } from "~/types/api";
 
 definePageMeta({
   layout: "dashboard",
@@ -460,15 +499,21 @@ const challenge = ref<any>(null);
 
 // User's participation data (would come from API in a real app)
 const userChallengeStatus = ref<string | null>(null);
-const userProgress = ref({
+
+interface UserProgress {
+  percentComplete: number;
+  currentDay: number;
+  savingsAmount: number;
+  activityLog: ChallengeActivity[];
+  features: string[];
+}
+
+const userProgress = ref<UserProgress>({
   percentComplete: 0,
   currentDay: 0,
   savingsAmount: 0,
-  activityLog: [] as Array<{
-    action: string;
-    date: string;
-    amount: number | null;
-  }>,
+  activityLog: [] as ChallengeActivity[],
+  features: [],
 });
 
 // Define type for valid Tailwind colors
@@ -537,9 +582,8 @@ async function fetchChallengeData() {
     if (response && response.data) {
       challenge.value = response.data;
 
-      // In a real app, we would also fetch the user's participation data
-      // For now, we'll simulate this with mock data
-      simulateUserParticipationData();
+      // Now check active challenges to see if user is participating
+      await checkActiveParticipation();
     } else {
       error.value = "Failed to load challenge details";
     }
@@ -551,53 +595,58 @@ async function fetchChallengeData() {
   }
 }
 
-// Simulate user participation data (would be API data in a real app)
-function simulateUserParticipationData() {
-  // For demo purposes, randomly determine if user is participating
-  // or use the forced view if available
-  const participating = forceParticipationView.value ? true : false;
+// Check if user is already participating in this challenge
+async function checkActiveParticipation() {
+  try {
+    const response = await challengeService.getActiveChallenges();
 
-  if (participating) {
-    userChallengeStatus.value = "In Progress";
-    const totalDays = challenge.value.total_days;
-    const currentDay = Math.floor(Math.random() * totalDays) + 1;
+    if (response && response.data && response.data.length > 0) {
+      // Find if this challenge is in the active list
+      const activeChallenge = response.data.find(
+        (c) => c.challenge_id === challengeId
+      );
 
-    userProgress.value = {
-      percentComplete: Math.round((currentDay / totalDays) * 100),
-      currentDay: currentDay,
-      savingsAmount: Math.floor(Math.random() * 100000) + 10000,
-      activityLog: [
-        {
-          action: "Joined Challenge",
-          date: new Date(
-            Date.now() - currentDay * 24 * 60 * 60 * 1000
-          ).toLocaleDateString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          }),
-          amount: null,
-        },
-      ],
-    };
+      if (activeChallenge) {
+        // User is participating in this challenge
+        userChallengeStatus.value = "In Progress";
 
-    // Generate activity logs
-    for (let i = 1; i <= currentDay; i++) {
-      userProgress.value.activityLog.push({
-        action: `Check-in: Day ${i}`,
-        date: new Date(
-          Date.now() - (currentDay - i) * 24 * 60 * 60 * 1000
-        ).toLocaleDateString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        }),
-        amount: Math.floor(Math.random() * 10000),
-      });
+        // Map active challenge data to our UI format
+        userProgress.value = {
+          percentComplete: activeChallenge.percentComplete,
+          currentDay: parseInt(
+            activeChallenge.progress.split("/")[0].replace("Day ", "")
+          ),
+          savingsAmount: activeChallenge.savingsAmount,
+          activityLog: activeChallenge.activityLog || [],
+          features: activeChallenge.features || [],
+        };
+      } else {
+        // User is not participating
+        userChallengeStatus.value = null;
+        resetUserProgress();
+      }
+    } else {
+      // No active challenges
+      userChallengeStatus.value = null;
+      resetUserProgress();
     }
-  } else {
+  } catch (err) {
+    console.error("Error checking active challenges:", err);
+    // Just reset user progress if we can't check participation
     userChallengeStatus.value = null;
+    resetUserProgress();
   }
+}
+
+// Reset user progress data when not participating
+function resetUserProgress() {
+  userProgress.value = {
+    percentComplete: 0,
+    currentDay: 0,
+    savingsAmount: 0,
+    activityLog: [] as ChallengeActivity[],
+    features: [],
+  };
 }
 
 // Determine if this is a challenge the user is already participating in
@@ -610,64 +659,95 @@ function formatCurrency(amount: number): string {
 }
 
 function joinThisChallenge() {
+  // Set challenge ID for the join modal
+  joinModalSelectedChallengeId.value = challengeId as string;
+
   // Open join modal
   showJoinModal.value = true;
 }
 
-function handleJoinChallenge(data: any) {
-  console.log("Joining challenge with data:", data);
+const joinModalSelectedChallengeId = ref<string>("");
 
-  // For demonstration purposes, toggle between views
-  forceParticipationView.value = true;
+function handleJoinChallenge(formData: any) {
+  // Prepare join request
+  const joinRequest = {
+    challenge_id: formData.challenge_id || joinModalSelectedChallengeId.value,
+    goal: formData.goal || "Complete the challenge successfully",
+    start_date: formData.start_date,
+  };
 
-  // Reset API data with user now participating
-  fetchChallengeData();
+  // Call the API to join the challenge
+  challengeService
+    .joinChallenge(joinRequest)
+    .then((response) => {
+      if (response && response.data) {
+        // Update the challenge status to show active view
+        userChallengeStatus.value = "In Progress";
 
-  // Close modal
-  showJoinModal.value = false;
+        // Map the response data to our UI format
+        userProgress.value = {
+          percentComplete: response.data.percentComplete,
+          currentDay: parseInt(
+            response.data.progress.split("/")[0].replace("Day ", "")
+          ),
+          savingsAmount: response.data.savingsAmount,
+          activityLog: response.data.activityLog || [],
+          features: response.data.features || [],
+        };
 
-  // Show success notification
-  alert(`Successfully joined ${challenge.value.title}!`);
+        // Show success notification
+        alert(`Successfully joined ${challenge.value.title}!`);
+      }
+    })
+    .catch((err) => {
+      console.error("Error joining challenge:", err);
+      alert(`Error: ${err.message || "Failed to join challenge"}`);
+    })
+    .finally(() => {
+      // Close modal
+      showJoinModal.value = false;
+    });
 }
 
 function handleCheckIn(data: any) {
-  console.log("Check-in data:", data);
+  // Format the request according to API requirements
+  const checkInRequest = {
+    date: data.date,
+    amount: data.amount,
+    completed: data.completed,
+    difficulty: data.difficulty,
+    notes: data.notes,
+    shareProgress: data.shareProgress,
+  };
 
-  // Update local state to reflect the check-in
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  // Call the API to check in
+  challengeService
+    .checkInChallenge(challengeId as string, checkInRequest)
+    .then((response) => {
+      if (response && response.data) {
+        // Update the progress with the API response
+        userProgress.value = {
+          percentComplete: response.data.percentComplete,
+          currentDay: parseInt(
+            response.data.progress.split("/")[0].replace("Day ", "")
+          ),
+          savingsAmount: response.data.savingsAmount,
+          activityLog: response.data.activityLog || [],
+          features: response.data.features || [],
+        };
 
-  const nextDay = userProgress.value.currentDay + 1;
-  const totalDays = challenge.value.total_days;
-
-  // Add to activity log
-  userProgress.value.activityLog.unshift({
-    action: `Check-in: Day ${nextDay}`,
-    date: formattedDate,
-    amount: data.amount || 0,
-  });
-
-  // Update progress
-  userProgress.value.currentDay = nextDay;
-  userProgress.value.percentComplete = Math.min(
-    Math.round((nextDay / totalDays) * 100),
-    100
-  );
-
-  // Update savings if applicable
-  if (data.amount) {
-    userProgress.value.savingsAmount += data.amount;
-  }
-
-  // Close modal
-  showCheckInModal.value = false;
-
-  // Show success notification
-  alert("Check-in successful! Your progress has been updated.");
+        // Show success notification
+        alert("Check-in successful! Your progress has been updated.");
+      }
+    })
+    .catch((err) => {
+      console.error("Error checking in:", err);
+      alert(`Error: ${err.message || "Failed to check in. Please try again."}`);
+    })
+    .finally(() => {
+      // Close modal
+      showCheckInModal.value = false;
+    });
 }
 
 // Fetch challenge data on component mount

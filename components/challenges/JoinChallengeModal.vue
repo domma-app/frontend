@@ -89,7 +89,7 @@
             <input
               type="date"
               id="startDate"
-              v-model="challengeData.startDate"
+              v-model="challengeData.start_date"
               class="block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring focus:ring-green-200 focus:ring-opacity-50"
               required
             />
@@ -168,6 +168,7 @@ const props = defineProps<{
   show: boolean;
   initialChallengeName?: string;
   challengeOptions: string[];
+  selectedChallengeId?: string;
 }>();
 
 const emit = defineEmits(["close", "submit"]);
@@ -207,8 +208,9 @@ const challengeDetails: ChallengeOption[] = [
 ];
 
 const challengeData = ref({
+  challenge_id: props.selectedChallengeId || "",
   name: props.initialChallengeName || "",
-  startDate: new Date().toISOString().split("T")[0],
+  start_date: new Date().toISOString().split("T")[0],
   notifications: {
     daily: true,
     progress: true,
@@ -256,8 +258,9 @@ watch(
     if (!newValue) {
       // Reset form when modal closes
       challengeData.value = {
+        challenge_id: props.selectedChallengeId || "",
         name: "",
-        startDate: new Date().toISOString().split("T")[0],
+        start_date: new Date().toISOString().split("T")[0],
         notifications: {
           daily: true,
           progress: true,

@@ -69,13 +69,14 @@
         </p>
         <div class="flex space-x-2">
           <NuxtLink
-            :to="`/dashboard/challenges/${challenge.id}`"
+            :to="`/dashboard/challenges/${challenge.challenge_id}`"
             class="px-2 sm:px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded transition-colors text-xs sm:text-sm"
           >
             Details
           </NuxtLink>
           <button
-            @click="$emit('join', challenge.title)"
+            v-if="!isJoined"
+            @click="$emit('join', challenge.title, challenge.challenge_id)"
             :class="`px-2 sm:px-3 py-1 bg-${getSafeColor(
               challenge.color
             )}-500 hover:bg-${getSafeColor(
@@ -84,6 +85,12 @@
           >
             Join
           </button>
+          <span
+            v-else
+            class="px-2 sm:px-3 py-1 bg-gray-200 text-gray-600 rounded text-xs sm:text-sm"
+          >
+            Joined
+          </span>
         </div>
       </div>
     </div>
@@ -150,10 +157,11 @@ function getSafeColor(color: string): TailwindColor {
 
 defineProps<{
   challenge: UiChallenge;
+  isJoined?: boolean;
 }>();
 
 defineEmits<{
-  (e: "join", title: string): void;
+  (e: "join", title: string, id: string): void;
 }>();
 </script>
 
