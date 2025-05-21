@@ -200,9 +200,9 @@
 const props = defineProps<{
   show: boolean;
   challenge: {
-    id: number;
+    id: string;
     title: string;
-    type?: "saving" | "spending" | "habit";
+    type?: string;
     color?: string;
     checkInDescription?: string;
   };

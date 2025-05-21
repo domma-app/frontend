@@ -49,7 +49,7 @@
 
 <script setup lang="ts">
 interface Challenge {
-  id: string | number;
+  id: string;
   title: string;
   description: string;
   progress: string;
@@ -58,6 +58,14 @@ interface Challenge {
   savingsLabel: string;
   savingsAmount: number;
   actionText: string;
+  type?: string;
+  checkInDescription?: string;
+  duration?: string;
+  difficulty?: number;
+  targetAmount?: number;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 defineProps<{

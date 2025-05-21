@@ -252,3 +252,39 @@ export interface UiChallenge {
   targetText: string;
   color: string;
 }
+
+/**
+ * Active challenge types
+ */
+export interface ActiveChallenge {
+  id: string;
+  title: string;
+  description: string;
+  progress: string;
+  percentComplete: number;
+  color: string;
+  savingsLabel: string;
+  savingsAmount: number;
+  actionText: string;
+  type: string;
+  checkInDescription: string;
+  duration: string;
+  difficulty: number;
+  targetAmount: number;
+  status: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface ActiveChallengesResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge[];
+  meta: {
+    totalItems: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
+  };
+}

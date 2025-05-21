@@ -2,10 +2,89 @@
   <div>
     <ChallengeHeader @open-join-modal="showJoinChallengeModal = true" />
 
-    <ActiveChallenges
-      :challenges="activeChallenges"
-      @check-in="handleChallengeCheckIn"
-    />
+    <!-- Active challenges section with loading and error states -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+      <div class="p-6 border-b border-gray-100">
+        <div class="flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-gray-800">
+            Your Active Challenges
+          </h2>
+        </div>
+      </div>
+
+      <div class="p-6">
+        <!-- Loading State -->
+        <div v-if="isLoadingActive" class="text-center py-8">
+          <svg
+            class="animate-spin h-8 w-8 mx-auto text-green-500"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="mt-2 text-sm text-gray-600">Loading active challenges...</p>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="activeError" class="text-center py-8">
+          <svg
+            class="mx-auto h-12 w-12 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">
+            {{ activeError }}
+          </h3>
+          <div class="mt-6">
+            <button
+              @click="fetchActiveChallenges"
+              class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Challenges -->
+        <div
+          v-else-if="activeChallenges.length === 0"
+          class="text-center text-gray-500 py-4"
+        >
+          You don't have any active challenges. Join a challenge to get started.
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <ActiveChallengeItem
+            v-for="challenge in activeChallenges"
+            :key="challenge.id"
+            :challenge="challenge"
+            @check-in="handleChallengeCheckIn"
+          />
+        </div>
+      </div>
+    </div>
 
     <!-- Featured Challenges -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden mt-6">
@@ -107,13 +186,13 @@
 </template>
 
 <script setup lang="ts">
-import ActiveChallenges from "~/components/challenges/ActiveChallenges.vue";
+import ActiveChallengeItem from "~/components/challenges/ActiveChallengeItem.vue";
 import ChallengeCard from "~/components/challenges/ChallengeCard.vue";
 import ChallengeHeader from "~/components/challenges/ChallengeHeader.vue";
 import JoinChallengeModal from "~/components/challenges/JoinChallengeModal.vue";
 import CheckInModal from "~/components/challenges/CheckInModal.vue";
 import { useChallengeService } from "~/services/api/challenge";
-import type { UiChallenge } from "~/types/api";
+import type { UiChallenge, ActiveChallenge } from "~/types/api";
 
 definePageMeta({
   layout: "dashboard",
@@ -167,24 +246,10 @@ async function fetchChallenges() {
   }
 }
 
-// Fetch challenges when component mounts
 onMounted(() => {
   fetchChallenges();
+  fetchActiveChallenges();
 });
-
-interface ActiveChallenge {
-  id: number;
-  title: string;
-  description: string;
-  progress: string;
-  percentComplete: number;
-  color: string;
-  savingsLabel: string;
-  savingsAmount: number;
-  actionText: string;
-  type?: "saving" | "spending" | "habit";
-  checkInDescription?: string;
-}
 
 interface CatalogChallenge {
   id: number;
@@ -194,6 +259,7 @@ interface CatalogChallenge {
   targetText: string;
   color: string;
   type?: "saving" | "spending" | "habit";
+  difficulty?: number;
 }
 
 interface JoinChallengeForm {
@@ -208,7 +274,7 @@ interface JoinChallengeForm {
 }
 
 interface CheckInData {
-  challengeId: number;
+  challengeId: string;
   date: string;
   amount?: number;
   completed?: boolean;
@@ -221,8 +287,8 @@ const router = useRouter();
 const showJoinChallengeModal = ref(false);
 const showCheckInModal = ref(false);
 const selectedChallenge = ref("");
-const selectedChallengeForCheckIn = ref<ActiveChallenge>({
-  id: 0,
+const selectedChallengeForCheckIn = ref({
+  id: "0",
   title: "",
   description: "",
   progress: "",
@@ -231,91 +297,63 @@ const selectedChallengeForCheckIn = ref<ActiveChallenge>({
   savingsLabel: "",
   savingsAmount: 0,
   actionText: "",
+  type: "saving",
+  checkInDescription: "",
+  duration: "",
+  difficulty: 1,
+  targetAmount: 0,
+  status: "active",
+  startDate: "",
+  endDate: "",
 });
 
-// Mock data for active challenges
-const activeChallenges = ref<ActiveChallenge[]>([
-  {
-    id: 1,
-    title: "30-Day No Eating Out",
-    description: "Cook all your meals at home for 30 days",
-    progress: "Day 15/30",
-    percentComplete: 50,
-    color: "green",
-    savingsLabel: "Potential Savings",
-    savingsAmount: 150000,
-    actionText: "Check In",
-    type: "spending",
-    checkInDescription: "How much did you save today by not eating out?",
-  },
-  {
-    id: 2,
-    title: "52-Week Savings",
-    description: "Save an increasing amount each week for a year",
-    progress: "Week 20/52",
-    percentComplete: 38,
-    color: "blue",
-    savingsLabel: "Current Saved",
-    savingsAmount: 210000,
-    actionText: "Deposit",
-    type: "saving",
-    checkInDescription: "Add this week's savings amount to your challenge.",
-  },
-  {
-    id: 3,
-    title: "No Spend Weekend",
-    description: "Commit to spending Rp0 for an entire weekend",
-    progress: "Day 1/2",
-    percentComplete: 50,
-    color: "amber",
-    savingsLabel: "Saved So Far",
-    savingsAmount: 25000,
-    actionText: "Check In",
-    type: "spending",
-    checkInDescription: "How much have you saved by not spending today?",
-  },
-  {
-    id: 4,
-    title: "Morning Meditation",
-    description:
-      "Meditate for 10 minutes every morning to improve financial mindfulness",
-    progress: "Day 10/21",
-    percentComplete: 48,
-    color: "indigo",
-    savingsLabel: "Mindful Decisions",
-    savingsAmount: 75000,
-    actionText: "Log Session",
-    type: "habit",
-    checkInDescription: "Did you complete your meditation session today?",
-  },
-  {
-    id: 5,
-    title: "30-Day Rp5.000 Challenge",
-    description: "Save Rp5.000 every day for a month",
-    progress: "Day 18/30",
-    percentComplete: 60,
-    color: "purple",
-    savingsLabel: "Total Saved",
-    savingsAmount: 90000,
-    actionText: "Add Today's Saving",
-    type: "saving",
-    checkInDescription: "Add your Rp5.000 saving for today.",
-  },
-  {
-    id: 6,
-    title: "Subscription Audit",
-    description: "Review and cancel unnecessary subscriptions",
-    progress: "Day 3/7",
-    percentComplete: 43,
-    color: "rose",
-    savingsLabel: "Monthly Savings",
-    savingsAmount: 120000,
-    actionText: "Log Cancellation",
-    type: "spending",
-    checkInDescription:
-      "Did you cancel any subscriptions today? How much did you save?",
-  },
-]);
+// Active challenges from API
+const activeChallenges = ref<ActiveChallenge[]>([]);
+const isLoadingActive = ref(false);
+const activeError = ref<string | null>(null);
+
+// Fetch active challenges from the API
+async function fetchActiveChallenges() {
+  isLoadingActive.value = true;
+  activeError.value = null;
+
+  try {
+    const response = await challengeService.getActiveChallenges();
+
+    if (response && response.data) {
+      // Map API response to the format expected by the UI
+      activeChallenges.value = response.data.map((challenge) => {
+        return {
+          id: challenge.id,
+          title: challenge.title,
+          description: challenge.description,
+          progress: challenge.progress,
+          percentComplete: challenge.percentComplete,
+          color: challenge.color,
+          savingsLabel: challenge.savingsLabel,
+          savingsAmount: challenge.savingsAmount,
+          actionText: challenge.actionText,
+          type: challenge.type,
+          checkInDescription: challenge.checkInDescription,
+          duration: challenge.duration,
+          difficulty: challenge.difficulty,
+          targetAmount: challenge.targetAmount,
+          status: challenge.status,
+          startDate: challenge.startDate,
+          endDate: challenge.endDate,
+        };
+      });
+    } else {
+      activeError.value = "Failed to load active challenges";
+    }
+  } catch (err) {
+    console.error("Error fetching active challenges:", err);
+    activeError.value =
+      "Failed to load active challenges. Please try again later.";
+  } finally {
+    isLoadingActive.value = false;
+  }
+}
 
 // Mock data for catalog challenges
 const catalogChallenges = ref<CatalogChallenge[]>([
@@ -387,15 +425,14 @@ function submitJoinChallenge(newChallenge: JoinChallengeForm): void {
 
   // Later, we would fetch the updated list of active challenges
   // For now, we'll simulate adding this challenge to the active list
-  const newChallengeId =
-    Math.max(...activeChallenges.value.map((c) => c.id)) + 1;
+  const newChallengeId = Math.floor(Math.random() * 10000).toString();
 
   // Get challenge details from catalog if available
   const catalogChallenge = catalogChallenges.value.find(
     (c) => c.title === newChallenge.name
   );
 
-  const newActiveChallenge: ActiveChallenge = {
+  const newActiveChallenge = {
     id: newChallengeId,
     title: newChallenge.name,
     description: catalogChallenge?.description || "",
@@ -406,12 +443,21 @@ function submitJoinChallenge(newChallenge: JoinChallengeForm): void {
     savingsAmount: 0,
     actionText: "Check In",
     type: catalogChallenge?.type || "saving", // Use the predefined type from catalog
+    checkInDescription: "Track your progress for today's challenge.",
+    duration: "30 Days",
+    difficulty: catalogChallenge?.difficulty || 1,
+    targetAmount: 0,
+    status: "active",
+    startDate: new Date().toISOString().split("T")[0],
+    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
   };
 
   activeChallenges.value.push(newActiveChallenge);
 }
 
-function handleChallengeCheckIn(id: number): void {
+function handleChallengeCheckIn(id: string): void {
   const challenge = activeChallenges.value.find((c) => c.id === id);
   if (challenge) {
     selectedChallengeForCheckIn.value = challenge;
@@ -473,5 +519,10 @@ function submitChallengeCheckIn(data: CheckInData): void {
 function handleBrowseMore(): void {
   // Navigate to the browse challenges page
   router.push("/dashboard/challenges/browse");
+}
+
+// Utility function to format currency
+function formatCurrency(amount: number): string {
+  return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 </script>

@@ -83,7 +83,7 @@
 import ActiveChallengeItem from "./ActiveChallengeItem.vue";
 
 interface Challenge {
-  id: number;
+  id: string;
   title: string;
   description: string;
   progress: string;
@@ -92,7 +92,7 @@ interface Challenge {
   savingsLabel: string;
   savingsAmount: number;
   actionText: string;
-  type?: "saving" | "spending" | "habit";
+  type?: string;
   checkInDescription?: string;
 }
 
