@@ -232,9 +232,7 @@ export interface ChallengeResponse {
 export interface ChallengeListResponse {
   status: boolean;
   message: string;
-  data: {
-    challenges: Challenge[];
-  };
+  data: Challenge[];
 }
 
 export interface ChallengeDeleteResponse {
@@ -245,6 +243,7 @@ export interface ChallengeDeleteResponse {
 // UI-specific challenge type for frontend display
 export interface UiChallenge {
   id: string;
+  challenge_id: string;
   title: string;
   description: string;
   duration: string;
@@ -255,10 +254,94 @@ export interface UiChallenge {
   color: string;
 }
 
+/*
+ * Active challenge types
+ */
+export interface ActiveChallenge {
+  id: string;
+  challenge_id: string;
+  title: string;
+  description: string;
+  progress: string;
+  percentComplete: number;
+  color: string;
+  savingsLabel: string;
+  savingsAmount: number;
+  actionText: string;
+  type: string;
+  checkInDescription: string;
+  duration: string;
+  difficulty: number;
+  targetAmount: number;
+  status: string;
+  startDate: string;
+  endDate: string;
+  features?: string[];
+  steps?: string[];
+  tips?: string[];
+  activityLog?: ChallengeActivity[];
+}
+
+export interface ChallengeActivity {
+  id: string;
+  action: string;
+  date: string;
+  amount?: number;
+  completed?: boolean;
+  difficulty?: number;
+  notes?: string;
+  shared?: boolean;
+}
+
+export interface ActiveChallengesResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge[];
+  meta: {
+    totalItems: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
+  };
+}
+
+/**
+ * Challenge Join Request/Response
+ */
+export interface ChallengeJoinRequest {
+  challenge_id: string;
+  goal: string;
+  start_date: string;
+}
+
+export interface ChallengeJoinResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge;
+}
+
+/**
+ * Challenge Check-In Request/Response
+ */
+export interface ChallengeCheckInRequest {
+  date: string;
+  amount?: number;
+  completed?: boolean;
+  difficulty: number;
+  notes?: string;
+  shareProgress: boolean;
+}
+
+export interface ChallengeCheckInResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge;
+}
+
 /**
  * Profile types
  */
-
 export interface UserProfile
   extends Omit<User, "id" | "created_at" | "updated_at" | "role"> {
   id?: string;
@@ -275,10 +358,6 @@ export interface UserPreferences {
     currency: string;
     dateFormat: string;
     theme: string;
-  };
-  privacy: {
-    analytics: boolean;
-    marketing: boolean;
   };
 }
 

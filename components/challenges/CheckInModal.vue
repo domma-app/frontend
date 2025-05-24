@@ -200,9 +200,9 @@
 const props = defineProps<{
   show: boolean;
   challenge: {
-    id: number;
+    id: string;
     title: string;
-    type?: "saving" | "spending" | "habit";
+    type?: string;
     color?: string;
     checkInDescription?: string;
   };
@@ -221,8 +221,12 @@ const checkInData = ref({
 function handleSubmit() {
   emit("submit", {
     challengeId: props.challenge.id,
-    date: new Date().toISOString(),
-    ...checkInData.value,
+    date: new Date().toISOString().split("T")[0],
+    amount: checkInData.value.amount || undefined,
+    completed: checkInData.value.completed,
+    difficulty: checkInData.value.difficulty,
+    notes: checkInData.value.notes || undefined,
+    shareProgress: checkInData.value.shareProgress,
   });
 }
 

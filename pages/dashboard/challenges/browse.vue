@@ -101,8 +101,7 @@
               <option value="">Category (All)</option>
               <option value="saving">Saving</option>
               <option value="spending">Spending Control</option>
-              <option value="investing">Investing</option>
-              <option value="financial-literacy">Financial Literacy</option>
+              <option value="habit">Habit</option>
             </select>
           </div>
 
@@ -118,7 +117,7 @@
 
       <div class="p-6">
         <!-- Loading State -->
-        <div v-if="isLoading" class="text-center py-8">
+        <div v-if="isLoading || isLoadingActive" class="text-center py-8">
           <svg
             class="animate-spin h-8 w-8 mx-auto text-green-500"
             xmlns="http://www.w3.org/2000/svg"
@@ -143,7 +142,7 @@
         </div>
 
         <!-- Error State -->
-        <div v-else-if="error" class="text-center py-8">
+        <div v-else-if="error || activeError" class="text-center py-8">
           <svg
             class="mx-auto h-12 w-12 text-red-500"
             fill="none"
@@ -158,10 +157,15 @@
               d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             ></path>
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">{{ error }}</h3>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">
+            {{ error || activeError }}
+          </h3>
           <div class="mt-6">
             <button
-              @click="fetchChallenges"
+              @click="
+                fetchChallenges();
+                fetchActiveChallenges();
+              "
               class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700"
             >
               Try Again
@@ -172,103 +176,15 @@
         <!-- Challenge Cards -->
         <div
           v-else-if="filteredChallenges.length > 0"
-          class="grid grid-cols-1 md:grid-cols-3 gap-6"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
         >
-          <div
+          <ChallengeCard
             v-for="challenge in filteredChallenges"
             :key="challenge.id"
-            class="border border-gray-200 rounded-lg overflow-hidden flex flex-col"
-          >
-            <div :class="`bg-${getSafeColor(challenge.color)}-50 p-4`">
-              <div class="flex justify-between">
-                <h3 class="text-lg font-medium text-gray-800">
-                  {{ challenge.title }}
-                </h3>
-                <div class="flex">
-                  <span
-                    v-for="i in 5"
-                    :key="i"
-                    :class="`w-4 h-4 ${
-                      i <= challenge.difficulty
-                        ? 'text-yellow-400'
-                        : 'text-gray-300'
-                    }`"
-                  >
-                    ★
-                  </span>
-                </div>
-              </div>
-              <p class="text-sm text-gray-600 mt-1">
-                {{ challenge.description }}
-              </p>
-              <div class="mt-2 flex items-center">
-                <span
-                  :class="`bg-${getSafeColor(
-                    challenge.color
-                  )}-100 text-${getSafeColor(
-                    challenge.color
-                  )}-800 text-xs px-2 py-1 rounded-full mr-2`"
-                >
-                  {{ challenge.duration }}
-                </span>
-                <span
-                  class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full"
-                >
-                  {{ challenge.category }}
-                </span>
-              </div>
-            </div>
-
-            <div class="p-4 flex-1">
-              <ul class="text-sm text-gray-600 space-y-2 mb-4">
-                <li
-                  v-for="(feature, index) in challenge.features.slice(0, 3)"
-                  :key="index"
-                  class="flex items-start"
-                >
-                  <svg
-                    class="w-4 h-4 text-green-500 mr-2 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    ></path>
-                  </svg>
-                  {{ feature }}
-                </li>
-              </ul>
-
-              <div class="flex items-center justify-between mt-auto">
-                <p class="font-medium text-gray-800">
-                  {{ challenge.targetText }}
-                </p>
-                <div class="flex space-x-2">
-                  <NuxtLink
-                    :to="`/dashboard/challenges/${challenge.id}`"
-                    class="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded transition-colors text-sm"
-                  >
-                    Details
-                  </NuxtLink>
-                  <button
-                    @click="joinChallenge(challenge.title)"
-                    :class="`px-3 py-1 bg-${getSafeColor(
-                      challenge.color
-                    )}-500 hover:bg-${getSafeColor(
-                      challenge.color
-                    )}-600 text-white rounded transition-colors text-sm`"
-                  >
-                    Join
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+            :challenge="challenge"
+            :isJoined="isJoined(challenge.challenge_id)"
+            @join="joinChallenge"
+          />
         </div>
 
         <!-- Empty State -->
@@ -304,12 +220,23 @@
         </div>
       </div>
     </div>
+
+    <JoinChallengeModal
+      :show="showJoinChallengeModal"
+      :initial-challenge-name="selectedChallenge"
+      :challenge-options="[]"
+      :selected-challenge-id="joinModalSelectedChallengeId"
+      @close="showJoinChallengeModal = false"
+      @submit="submitJoinChallenge"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useChallengeService } from "~/services/api/challenge";
-import type { UiChallenge } from "~/types/api";
+import type { UiChallenge, ActiveChallenge } from "~/types/api";
+import ChallengeCard from "~/components/challenges/ChallengeCard.vue";
+import JoinChallengeModal from "~/components/challenges/JoinChallengeModal.vue";
 
 definePageMeta({
   layout: "dashboard",
@@ -378,6 +305,23 @@ const error = ref<string | null>(null);
 // Initialize challenges with an empty array
 const challenges = ref<UiChallenge[]>([]);
 
+// Active challenges state
+const activeChallenges = ref<ActiveChallenge[]>([]);
+const isLoadingActive = ref(false);
+const activeError = ref<string | null>(null);
+
+// Check if a challenge is already joined
+function isJoined(challengeId: string): boolean {
+  return activeChallenges.value.some(
+    (challenge) => challenge.challenge_id === challengeId
+  );
+}
+
+// Join challenge modal state
+const showJoinChallengeModal = ref(false);
+const selectedChallenge = ref("");
+const joinModalSelectedChallengeId = ref<string>("");
+
 // Fetch challenges from the API
 async function fetchChallenges() {
   isLoading.value = true;
@@ -386,11 +330,12 @@ async function fetchChallenges() {
   try {
     const response = await challengeService.getChallenges();
 
-    if (response.status && response.data && response.data.challenges) {
+    if (response && response.data) {
       // Map API response to the format expected by the UI
-      challenges.value = response.data.challenges.map((challenge) => {
+      challenges.value = response.data.map((challenge) => {
         return {
           id: challenge.id,
+          challenge_id: challenge.id,
           title: challenge.title,
           description: challenge.description,
           duration: `${challenge.total_days} Days`,
@@ -399,7 +344,7 @@ async function fetchChallenges() {
             challenge.type === "saving"
               ? "Saving"
               : challenge.type === "spending"
-              ? "Spending"
+              ? "Spending Control"
               : challenge.type === "habit"
               ? "Habit"
               : "Default",
@@ -419,9 +364,55 @@ async function fetchChallenges() {
   }
 }
 
+// Fetch active challenges from the API
+async function fetchActiveChallenges() {
+  isLoadingActive.value = true;
+  activeError.value = null;
+
+  try {
+    const response = await challengeService.getActiveChallenges();
+
+    if (response && response.data) {
+      activeChallenges.value = response.data.map((challenge) => {
+        return {
+          id: challenge.id,
+          challenge_id: challenge.challenge_id,
+          title: challenge.title,
+          description: challenge.description,
+          progress: challenge.progress,
+          percentComplete: challenge.percentComplete,
+          color: challenge.color,
+          savingsLabel: challenge.savingsLabel || "",
+          savingsAmount: challenge.savingsAmount || 0,
+          actionText: challenge.actionText || "Check In",
+          type: challenge.type,
+          checkInDescription: challenge.checkInDescription || "",
+          duration: challenge.duration || "",
+          difficulty: challenge.difficulty || 1,
+          targetAmount: challenge.targetAmount || 0,
+          status: challenge.status || "active",
+          startDate: challenge.startDate || "",
+          endDate: challenge.endDate || "",
+          features: challenge.features || [],
+          activityLog: challenge.activityLog || [],
+        };
+      });
+    } else {
+      activeError.value = "Failed to load active challenges";
+    }
+  } catch (err) {
+    console.error("Error fetching active challenges:", err);
+    activeError.value =
+      "Failed to load active challenges. Please try again later.";
+  } finally {
+    isLoadingActive.value = false;
+  }
+}
+
 // Fetch challenges when component mounts
 onMounted(() => {
   fetchChallenges();
+  fetchActiveChallenges();
 });
 
 // Filter state
@@ -443,9 +434,41 @@ function resetFilters() {
 }
 
 // Join challenge function
-function joinChallenge(challengeName: string) {
-  console.log("Joining challenge:", challengeName);
-  // Later, this would show a join modal or redirect to join page
+function joinChallenge(challengeName: string, challengeId: string) {
+  selectedChallenge.value = challengeName;
+  joinModalSelectedChallengeId.value = challengeId;
+  showJoinChallengeModal.value = true;
+}
+
+// Submit join challenge
+function submitJoinChallenge(formData: any) {
+  const joinRequest = {
+    challenge_id: formData.challenge_id || joinModalSelectedChallengeId.value,
+    goal: formData.goal || "Complete the challenge successfully",
+    start_date: formData.start_date,
+  };
+
+  // Call the API to join the challenge
+  challengeService
+    .joinChallenge(joinRequest)
+    .then((response) => {
+      if (response && response.data) {
+        // Add the newly joined challenge to the active challenges list
+        activeChallenges.value.push(response.data);
+
+        // Show success notification
+        alert(`Successfully joined ${response.data.title}!`);
+      }
+    })
+    .catch((err) => {
+      console.error("Error joining challenge:", err);
+      alert(
+        `Error: ${err.message || "Failed to join challenge. Please try again."}`
+      );
+    })
+    .finally(() => {
+      showJoinChallengeModal.value = false;
+    });
 }
 
 // Computed filtered challenges
