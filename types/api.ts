@@ -254,3 +254,44 @@ export interface UiChallenge {
   targetText: string;
   color: string;
 }
+
+/**
+ * Profile types
+ */
+
+export interface UserProfile
+  extends Omit<User, "id" | "created_at" | "updated_at" | "role"> {
+  id?: string;
+}
+
+export interface UserPreferences {
+  notifications: {
+    email: boolean;
+    push: boolean;
+    budget: boolean;
+    challenges: boolean;
+  };
+  display: {
+    currency: string;
+    dateFormat: string;
+    theme: string;
+  };
+  privacy: {
+    analytics: boolean;
+    marketing: boolean;
+  };
+}
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface FinancialGoal {
+  id?: string;
+  name: string;
+  description: string;
+  target_amount: number;
+  current_amount: number;
+  target_date: string;
+}
