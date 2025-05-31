@@ -406,6 +406,7 @@ watch(isAuthenticated, (newValue) => {
     router.push("/dashboard");
   }
 });
+
 // Features section data (translated)
 const features = [
   {
