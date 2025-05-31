@@ -135,27 +135,166 @@
 
         <div class="flex items-center">
           <!-- Notification bell -->
-          <button
-            class="p-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-gray-100 relative"
-          >
-            <span
-              class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"
-            ></span>
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+          <div class="relative">
+            <button
+              @click="toggleNotifications"
+              class="p-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-gray-100 relative"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              ></path>
-            </svg>
-          </button>
+              <span
+                v-if="hasUnreadNotifications"
+                class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"
+              ></span>
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                ></path>
+              </svg>
+            </button>
+
+            <!-- Notification dropdown -->
+            <div
+              v-if="isNotificationsOpen"
+              class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
+              @click.away="isNotificationsOpen = false"
+            >
+              <div
+                class="px-4 py-3 border-b border-gray-100 flex justify-between items-center"
+              >
+                <p class="text-sm font-medium text-gray-800">Notifications</p>
+                <button
+                  @click="markAllAsRead"
+                  class="text-xs text-green-500 hover:text-green-700"
+                >
+                  Mark all as read
+                </button>
+              </div>
+              <div class="max-h-80 overflow-y-auto">
+                <div
+                  v-if="notifications.length === 0"
+                  class="py-6 text-center text-gray-500"
+                >
+                  <p>No notifications</p>
+                </div>
+                <div v-else>
+                  <div
+                    v-for="(notification, index) in notifications"
+                    :key="index"
+                    class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                    :class="{ 'bg-green-50': !notification.read }"
+                  >
+                    <div class="flex items-start">
+                      <div class="flex-shrink-0 mt-0.5">
+                        <div
+                          class="w-8 h-8 rounded-full flex items-center justify-center"
+                          :class="
+                            notification.type === 'success'
+                              ? 'bg-green-100 text-green-600'
+                              : notification.type === 'warning'
+                              ? 'bg-yellow-100 text-yellow-600'
+                              : 'bg-blue-100 text-blue-600'
+                          "
+                        >
+                          <svg
+                            v-if="notification.type === 'success'"
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                          <svg
+                            v-else-if="notification.type === 'warning'"
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            ></path>
+                          </svg>
+                          <svg
+                            v-else
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-gray-900">
+                          {{ notification.title }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                          {{ notification.message }}
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                          {{ notification.time }}
+                        </p>
+                      </div>
+                      <button
+                        @click="markAsRead(index)"
+                        v-if="!notification.read"
+                        class="ml-2 text-gray-400 hover:text-gray-600"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="px-4 py-3 border-t border-gray-100">
+                <NuxtLink
+                  to="#"
+                  class="block text-center text-sm text-green-500 hover:text-green-700 font-medium"
+                >
+                  View all notifications
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
 
           <!-- Student dropdown menu -->
           <div class="ml-3 relative">
@@ -384,6 +523,65 @@ const { user, logout: authLogout } = useAuth();
 // Profile dropdown state
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
+
+// Notification state
+const isNotificationsOpen = ref(false);
+const notifications = ref([
+  {
+    id: 1,
+    type: "success",
+    title: "Target tabungan tercapai!",
+    message: 'Anda telah mencapai target tabungan "Laptop baru".',
+    time: "5 menit yang lalu",
+    read: false,
+  },
+  {
+    id: 2,
+    type: "info",
+    title: "Pengingat pembayaran",
+    message: "Tagihan UKT akan jatuh tempo dalam 3 hari.",
+    time: "2 jam yang lalu",
+    read: false,
+  },
+  {
+    id: 3,
+    type: "warning",
+    title: "Perhatian anggaran",
+    message: "Anda telah menggunakan 80% dari anggaran makanan bulan ini.",
+    time: "Kemarin",
+    read: false,
+  },
+  {
+    id: 4,
+    type: "info",
+    title: "Tantangan baru tersedia",
+    message: 'Tantangan "Hemat 30 hari" telah tersedia untuk Anda.',
+    time: "2 hari yang lalu",
+    read: true,
+  },
+]);
+
+// Toggle notification dropdown visibility
+const toggleNotifications = () => {
+  isNotificationsOpen.value = !isNotificationsOpen.value;
+};
+
+// Check if there are unread notifications
+const hasUnreadNotifications = computed(() => {
+  return notifications.value.some((notification) => !notification.read);
+});
+
+// Mark a notification as read
+const markAsRead = (index: number) => {
+  notifications.value[index].read = true;
+};
+
+// Mark all notifications as read
+const markAllAsRead = () => {
+  notifications.value.forEach((notification) => {
+    notification.read = true;
+  });
+};
 
 // Toggle dropdown visibility
 const toggleDropdown = () => {
