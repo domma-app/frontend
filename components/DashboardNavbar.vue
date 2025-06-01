@@ -137,6 +137,7 @@
           <!-- Notification bell -->
           <div class="relative">
             <button
+              ref="notificationBtnRef"
               @click="toggleNotifications"
               class="p-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-gray-100 relative"
             >
@@ -163,19 +164,40 @@
             <!-- Notification dropdown -->
             <div
               v-if="isNotificationsOpen"
+              ref="notificationRef"
               class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
-              @click.away="isNotificationsOpen = false"
             >
               <div
                 class="px-4 py-3 border-b border-gray-100 flex justify-between items-center"
               >
                 <p class="text-sm font-medium text-gray-800">Notifications</p>
-                <button
-                  @click="markAllAsRead"
-                  class="text-xs text-green-500 hover:text-green-700"
-                >
-                  Mark all as read
-                </button>
+                <div class="flex items-center">
+                  <button
+                    @click="markAllAsRead"
+                    class="text-xs text-green-500 hover:text-green-700 mr-3"
+                  >
+                    Mark all as read
+                  </button>
+                  <button
+                    @click="isNotificationsOpen = false"
+                    class="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div class="max-h-80 overflow-y-auto">
                 <div
@@ -300,13 +322,20 @@
           <div class="ml-3 relative">
             <div>
               <button
+                ref="profileBtnRef"
                 @click="toggleDropdown"
                 type="button"
                 class="flex items-center max-w-xs bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 p-1.5"
                 id="user-menu-button"
               >
                 <span class="sr-only">Open user menu</span>
+                <div
+                  v-if="user?.profile_picture_url"
+                  class="h-8 w-8 rounded-full bg-cover bg-center"
+                  :style="`background-image: url('${user.profile_picture_url}')`"
+                ></div>
                 <span
+                  v-else
                   class="bg-green-500 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold"
                 >
                   {{ userInitials }}
@@ -316,16 +345,40 @@
 
             <div
               v-if="isDropdownOpen"
+              ref="profileDropdownRef"
               class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-              @click.away="isDropdownOpen = false"
             >
-              <div class="px-4 py-3 border-b border-gray-100">
-                <p class="text-sm text-gray-500">Signed in as</p>
-                <p class="text-sm font-medium text-gray-800 truncate">
-                  {{ userName }}
-                </p>
+              <div
+                class="px-4 py-3 border-b border-gray-100 flex justify-between items-center"
+              >
+                <div>
+                  <p class="text-sm text-gray-500">Signed in as</p>
+                  <p class="text-sm font-medium text-gray-800 truncate">
+                    {{ userName }}
+                  </p>
+                </div>
+                <button
+                  @click="isDropdownOpen = false"
+                  class="text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
               </div>
               <div class="pt-2">
+                <!-- Mahasiswa+ section commented out for now 
                 <div class="border-b border-gray-100 pb-2">
                   <p
                     class="px-4 text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -357,16 +410,17 @@
                     Kalender Finansial
                   </NuxtLink>
                 </div>
+                -->
               </div>
               <div class="py-1">
                 <NuxtLink
-                  to="dashboard/profile"
+                  to="/dashboard/profile"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Your Profile
                 </NuxtLink>
                 <NuxtLink
-                  to="#"
+                  to="/dashboard/profile?tab=settings"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Settings
@@ -384,7 +438,7 @@
           <!-- Mobile menu button -->
           <div class="flex md:hidden ml-2">
             <button
-              @click="isMobileMenuOpen = !isMobileMenuOpen"
+              @click="toggleMobileMenu"
               type="button"
               class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
               aria-controls="mobile-menu"
@@ -479,6 +533,7 @@
           Tantangan
         </NuxtLink>
 
+        <!-- Mahasiswa+ section commented out for now 
         <div class="border-t border-gray-200 mt-4 pt-4">
           <p
             class="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -510,12 +565,15 @@
             Kalender Finansial
           </NuxtLink>
         </div>
+        -->
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from "vue";
+
 const $route = useRoute();
 const router = useRouter();
 const { user, logout: authLogout } = useAuth();
@@ -561,9 +619,73 @@ const notifications = ref([
   },
 ]);
 
+// Close dropdowns when clicking outside or pressing Escape
+const notificationRef = ref<HTMLElement | null>(null);
+const profileDropdownRef = ref<HTMLElement | null>(null);
+const notificationBtnRef = ref<HTMLElement | null>(null);
+const profileBtnRef = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("click", handleDocumentClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeyDown);
+  document.removeEventListener("click", handleDocumentClick);
+});
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+    isNotificationsOpen.value = false;
+    isDropdownOpen.value = false;
+  }
+};
+
+// Handle clicks on document to close dropdowns
+const handleDocumentClick = (event: MouseEvent) => {
+  // For notifications dropdown
+  if (
+    isNotificationsOpen.value &&
+    notificationRef.value &&
+    notificationBtnRef.value
+  ) {
+    // If clicking outside both the dropdown and its toggle button
+    if (
+      !notificationRef.value.contains(event.target as Node) &&
+      !notificationBtnRef.value.contains(event.target as Node)
+    ) {
+      isNotificationsOpen.value = false;
+    }
+  }
+
+  // For profile dropdown
+  if (isDropdownOpen.value && profileDropdownRef.value && profileBtnRef.value) {
+    // If clicking outside both the dropdown and its toggle button
+    if (
+      !profileDropdownRef.value.contains(event.target as Node) &&
+      !profileBtnRef.value.contains(event.target as Node)
+    ) {
+      isDropdownOpen.value = false;
+    }
+  }
+};
+
+// Toggle mobile menu
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  isNotificationsOpen.value = false;
+  isDropdownOpen.value = false;
+};
+
 // Toggle notification dropdown visibility
 const toggleNotifications = () => {
-  isNotificationsOpen.value = !isNotificationsOpen.value;
+  if (isNotificationsOpen.value) {
+    isNotificationsOpen.value = false;
+  } else {
+    isNotificationsOpen.value = true;
+    isDropdownOpen.value = false; // Close profile dropdown when opening notifications
+  }
 };
 
 // Check if there are unread notifications
@@ -585,7 +707,12 @@ const markAllAsRead = () => {
 
 // Toggle dropdown visibility
 const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
+  if (isDropdownOpen.value) {
+    isDropdownOpen.value = false;
+  } else {
+    isDropdownOpen.value = true;
+    isNotificationsOpen.value = false; // Close notifications when opening profile dropdown
+  }
 };
 
 // Get user's name and initials for display

@@ -14,6 +14,7 @@ export interface User {
   phone: string;
   university: string;
   major: string;
+  profile_picture_url?: string | null;
   created_at: string;
   updated_at: string;
   role: string;
@@ -343,8 +344,9 @@ export interface ChallengeCheckInResponse {
  * Profile types
  */
 export interface UserProfile
-  extends Omit<User, "id" | "created_at" | "updated_at" | "role"> {
+  extends Omit<User, "id" | "created_at" | "updated_at" | "role" | "email"> {
   id?: string;
+  email?: string;
 }
 
 export interface UserPreferences {
@@ -373,4 +375,26 @@ export interface FinancialGoal {
   target_amount: number;
   current_amount: number;
   target_date: string;
+}
+
+/**
+ * Profile response types
+ */
+export interface GetProfileResponse {
+  success: boolean;
+  data: UserProfile;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  data: UserProfile;
+}
+
+export interface UploadProfilePictureResponse {
+  success: boolean;
+  message: string;
+  data: {
+    profile_picture_url: string;
+  }
 }

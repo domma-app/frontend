@@ -139,6 +139,27 @@ export function useAuth() {
     }
   };
 
+  // Update user data in state and storage
+  const updateUserData = (updatedUser: User) => {
+    if (!authState.value.user || !authState.value.isAuthenticated) return;
+
+    // Update state
+    authState.value = {
+      ...authState.value,
+      user: updatedUser,
+    };
+
+    // Update storage
+    if (process.client) {
+      // Check if data is in localStorage or sessionStorage
+      const inLocalStorage = localStorage.getItem("auth_access_token");
+      const storage = inLocalStorage ? localStorage : sessionStorage;
+
+      // Update user data in storage
+      storage.setItem("auth_user", JSON.stringify(updatedUser));
+    }
+  };
+
   // Clear authentication state
   const clearAuth = (storageType: "local" | "session" | "both" = "both") => {
     authState.value = {
@@ -224,6 +245,7 @@ export function useAuth() {
     login,
     logout,
     getAccessToken,
+    updateUserData,
     isAuthenticated: computed(() => authState.value.isAuthenticated),
     user: computed(() => authState.value.user),
   };

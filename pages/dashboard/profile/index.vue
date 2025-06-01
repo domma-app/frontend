@@ -34,9 +34,15 @@ const activeSection = ref("personal");
 
 // Watch for query param changes to update active section
 watchEffect(() => {
+  // Support both 'section' and 'tab' query parameters
   const section = route.query.section as string;
+  const tab = route.query.tab as string;
+
   if (section && ["personal", "preferences", "goals"].includes(section)) {
     activeSection.value = section;
+  } else if (tab === "settings") {
+    // When "settings" tab is requested, show preferences section
+    activeSection.value = "preferences";
   }
 });
 </script>

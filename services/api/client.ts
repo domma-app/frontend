@@ -20,10 +20,14 @@ export class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
 
     // Default headers
-    const headers = {
-      "Content-Type": "application/json",
-      ...options.headers,
+    const headers: Record<string, string> = {
+      ...options.headers as Record<string, string>,
     };
+    
+    // Add Content-Type header only if not sending FormData
+    if (!(options.body instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
 
     // Merge options with defaults
     const requestOptions: RequestInit = {

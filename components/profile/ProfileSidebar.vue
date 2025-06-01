@@ -4,6 +4,12 @@
     <div class="flex flex-col items-center mb-6">
       <div class="bg-green-50 rounded-full p-4 mb-3">
         <div
+          v-if="user?.profile_picture_url"
+          class="w-20 h-20 rounded-full bg-cover bg-center"
+          :style="`background-image: url('${user.profile_picture_url}')`"
+        ></div>
+        <div
+          v-else
           class="w-20 h-20 rounded-full bg-green-500 flex items-center justify-center text-white text-2xl font-bold"
         >
           {{ userInitials }}
