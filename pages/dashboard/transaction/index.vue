@@ -114,7 +114,7 @@ async function fetchTransactions() {
   try {
     loading.value = true;
     error.value = "";
-    const response = await transactionService.getTransactions();
+    const response = await transactionService.getTransactions(activeFilters.value);
 
     // Check the response structure and handle accordingly
     const transactions = response.data || [];
@@ -206,6 +206,7 @@ const totalPages = computed(() => {
 // Event handlers
 function handleFilterChange(filters: any) {
   activeFilters.value = { ...filters };
+  fetchTransactions(); // Reload transactions with new filters
   currentPage.value = 1; // Reset to first page when filters change
 }
 
