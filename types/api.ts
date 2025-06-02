@@ -398,3 +398,39 @@ export interface UploadProfilePictureResponse {
     profile_picture_url: string;
   }
 }
+
+/**
+ * Dashboard types
+ */
+export interface DashboardSummary {
+  balance: number;
+  balanceChange: number;
+  income: number;
+  expenses: number;
+  remaining: number;
+  goalTarget: number;
+  goalProgress: number;
+}
+
+export interface DashboardPrediction {
+  predictedExpenses: number;
+  expenseChangePercent: number;
+  topExpenseCategory: string;
+  topExpensePercentage: number;
+  recommendedSavings: number;
+}
+
+export interface DailyTip {
+  title: string;
+  content: string;
+}
+
+export interface DashboardDataResponse {
+  status: boolean;
+  message: string;
+  data: {
+    summary: DashboardSummary;
+    prediction: DashboardPrediction;
+    tip: DailyTip;
+  };
+}
