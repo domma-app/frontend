@@ -15,6 +15,11 @@
       <BudgetProgress />
     </div>
 
+    <!-- Stock Analysis section -->
+    <div class="mb-6">
+      <StockAnalyzer />
+    </div>
+
     <!-- Quick actions and tips section -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <!-- Quick actions -->
@@ -28,6 +33,13 @@
 
 <script setup lang="ts">
 import { useDashboardService } from "~/services";
+import WelcomeSection from "~/components/dashboard/WelcomeSection.vue";
+import PredictionSection from "~/components/dashboard/PredictionSection.vue";
+import RecentTransactions from "~/components/dashboard/RecentTransactions.vue";
+import BudgetProgress from "~/components/dashboard/BudgetProgress.vue";
+import QuickActions from "~/components/dashboard/QuickActions.vue";
+import DailyTips from "~/components/dashboard/DailyTips.vue";
+import StockAnalyzer from "~/components/dashboard/StockAnalyzer.vue";
 import type {
   DashboardSummary,
   DashboardPrediction,

@@ -434,3 +434,14 @@ export interface DashboardDataResponse {
     tip: DailyTip;
   };
 }
+
+// Stock analysis metrics data structure
+export interface StockAnalysisMetrics {
+  [key: string]: number; // All metrics are numbers with string keys
+}
+
+// Stock analysis result data structure
+export interface StockAnalysisResult {
+  avg_metrics: StockAnalysisMetrics;
+  recommendation: "Recommended" | "Not Recommended";
+}

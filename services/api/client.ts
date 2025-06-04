@@ -29,6 +29,15 @@ export class ApiClient {
       headers["Content-Type"] = "application/json";
     }
 
+    // Add authentication token if available
+    const token = localStorage.getItem("auth_access_token") || sessionStorage.getItem("auth_access_token");
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      console.log("Adding auth token to request:", endpoint);
+    } else {
+      console.warn("No auth token found for request:", endpoint);
+    }
+
     // Merge options with defaults
     const requestOptions: RequestInit = {
       ...options,
@@ -36,9 +45,15 @@ export class ApiClient {
     };
 
     try {
+      console.log("Making API request to:", url);
       const response = await fetch(url, requestOptions);
       const data = await response.json();
       if (!response.ok) {
+        console.error("API request failed:", {
+          url,
+          status: response.status,
+          data
+        });
         return {
           error: {
             message: data.message || "Something went wrong",
