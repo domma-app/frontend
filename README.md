@@ -2,6 +2,19 @@
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
+## ⚠️ Requirements
+
+- **Node.js v22.14.0 or higher**
+
+> ⚠️ The project **does not work reliably** on Node.js 20.x or below. Make sure you're using **Node.js v22.14.0+** before proceeding.
+
+You can use tools like [nvm](https://github.com/nvm-sh/nvm) to manage Node.js versions:
+
+```bash
+nvm install 22.14.0
+nvm use 22.14.0
+```
+
 ## Setup
 
 Make sure to install dependencies:

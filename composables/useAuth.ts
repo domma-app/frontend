@@ -1,12 +1,12 @@
-import { useAuthService } from '~/services/api/auth';
-import type { 
-  AuthState, 
-  User, 
-  RegisterRequest, 
+import { useAuthService } from "~/services/api/auth";
+import type {
+  AuthState,
+  User,
+  RegisterRequest,
   LoginRequest,
-  LoginResponse, 
-  RegisterResponse 
-} from '~/types/api';
+  LoginResponse,
+  RegisterResponse,
+} from "~/types/api";
 
 // Token expiry time in milliseconds
 const TOKEN_EXPIRY_REMEMBER = 30 * 24 * 60 * 60 * 1000; // 30 days
@@ -139,6 +139,27 @@ export function useAuth() {
     }
   };
 
+  // Update user data in state and storage
+  const updateUserData = (updatedUser: User) => {
+    if (!authState.value.user || !authState.value.isAuthenticated) return;
+
+    // Update state
+    authState.value = {
+      ...authState.value,
+      user: updatedUser,
+    };
+
+    // Update storage
+    if (process.client) {
+      // Check if data is in localStorage or sessionStorage
+      const inLocalStorage = localStorage.getItem("auth_access_token");
+      const storage = inLocalStorage ? localStorage : sessionStorage;
+
+      // Update user data in storage
+      storage.setItem("auth_user", JSON.stringify(updatedUser));
+    }
+  };
+
   // Clear authentication state
   const clearAuth = (storageType: "local" | "session" | "both" = "both") => {
     authState.value = {
@@ -167,15 +188,18 @@ export function useAuth() {
   };
 
   // Register a new user
-  const register = async (userData: RegisterRequest): Promise<RegisterResponse> => {
+  const register = async (
+    userData: RegisterRequest
+  ): Promise<RegisterResponse> => {
     const response = await authService.register(userData);
     return response;
   };
 
   // Login user
-  const login = async (userData: LoginRequest & { rememberMe?: boolean }): Promise<LoginResponse> => {
+  const login = async (
+    userData: LoginRequest & { rememberMe?: boolean }
+  ): Promise<LoginResponse> => {
     const rememberMe = userData.rememberMe || false;
-    
     const response = await authService.login({
       email: userData.email,
       password: userData.password,
@@ -199,13 +223,13 @@ export function useAuth() {
     // Call the server to invalidate the token if we have one
     if (authState.value.accessToken) {
       try {
-        await authService.logout(authState.value.accessToken);
+        // await authService.logout(authState.value.accessToken);
       } catch (error) {
-        console.error('Error during server logout:', error);
+        console.error("Error during server logout:", error);
         // Continue with local logout even if server logout fails
       }
     }
-    
+
     clearAuth();
     // Redirect will be handled by the component calling this function
   };
@@ -221,6 +245,7 @@ export function useAuth() {
     login,
     logout,
     getAccessToken,
+    updateUserData,
     isAuthenticated: computed(() => authState.value.isAuthenticated),
     user: computed(() => authState.value.user),
   };

@@ -29,6 +29,9 @@
       </button>
     </div>
 
+    <!-- Budget Filters -->
+    <BudgetFilters @filter="handleFilterChange" />
+
     <!-- Loading state -->
     <div v-if="loading" class="bg-white rounded-lg shadow-sm p-8 text-center">
       <div class="inline-flex items-center">
@@ -215,6 +218,12 @@ const editingCategory = ref("");
 // State for budget data
 const budgetData = ref<Budget[]>([]);
 
+// Filter state
+const activeFilters = ref({
+  category: "all",
+  month_year: "",
+});
+
 // Function to hide the success message and clear any redirect timer
 function hideSuccessMessage() {
   success.value = false;
@@ -231,7 +240,7 @@ async function fetchBudgets() {
     loading.value = true;
     error.value = "";
 
-    const response = await budgetService.getBudgets();
+    const response = await budgetService.getBudgets(activeFilters.value);
     budgetData.value = response.data.budgets || [];
 
     // Refresh the summary after loading budgets
@@ -482,5 +491,11 @@ async function saveBudget(budgetFormData: any) {
   } finally {
     loading.value = false;
   }
+}
+
+// Handle filter changes from the BudgetFilters component
+function handleFilterChange(filters: any) {
+  activeFilters.value = { ...filters };
+  fetchBudgets(); // Reload budgets with new filters
 }
 </script>

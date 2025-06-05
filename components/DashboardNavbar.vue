@@ -114,8 +114,69 @@
                   : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
               ]"
             >
+              <div class="flex items-center">
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  ></path>
+                </svg>
+                <span>Tantangan</span>
+              </div>
+            </NuxtLink>
+
+            <NuxtLink
+              to="/dashboard/chatbot"
+              class="px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
+              :class="[
+                $route.path.startsWith('/dashboard/chatbot')
+                  ? 'text-green-500 bg-green-50'
+                  : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
+              ]"
+            >
+              <div class="flex items-center">
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  ></path>
+                </svg>
+                <span>AI Assistant</span>
+              </div>
+            </NuxtLink>
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          <!-- Notification bell -->
+          <div class="relative">
+            <button
+              ref="notificationBtnRef"
+              @click="toggleNotifications"
+              class="p-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-gray-100 relative"
+            >
+              <span
+                v-if="hasUnreadNotifications"
+                class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"
+              ></span>
               <svg
-                class="w-5 h-5 mr-1.5"
+                class="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -125,49 +186,186 @@
                   stroke-linecap="round"
                   stroke-linejoin="round"
                   stroke-width="2"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
                 ></path>
               </svg>
-              <span>Tantangan</span>
-            </NuxtLink>
-          </div>
-        </div>
+            </button>
 
-        <div class="flex items-center">
-          <!-- Notification bell -->
-          <button
-            class="p-2 rounded-full text-gray-600 hover:text-green-500 hover:bg-gray-100 relative"
-          >
-            <span
-              class="absolute top-1 right-1 w-2 h-2 rounded-full bg-red-500"
-            ></span>
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+            <!-- Notification dropdown -->
+            <div
+              v-if="isNotificationsOpen"
+              ref="notificationRef"
+              class="origin-top-right absolute right-0 mt-2 w-80 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-10"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-              ></path>
-            </svg>
-          </button>
+              <div
+                class="px-4 py-3 border-b border-gray-100 flex justify-between items-center"
+              >
+                <p class="text-sm font-medium text-gray-800">Notifications</p>
+                <div class="flex items-center">
+                  <button
+                    @click="markAllAsRead"
+                    class="text-xs text-green-500 hover:text-green-700 mr-3"
+                  >
+                    Mark all as read
+                  </button>
+                  <button
+                    @click="isNotificationsOpen = false"
+                    class="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="max-h-80 overflow-y-auto">
+                <div
+                  v-if="notifications.length === 0"
+                  class="py-6 text-center text-gray-500"
+                >
+                  <p>No notifications</p>
+                </div>
+                <div v-else>
+                  <div
+                    v-for="(notification, index) in notifications"
+                    :key="index"
+                    class="px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                    :class="{ 'bg-green-50': !notification.read }"
+                  >
+                    <div class="flex items-start">
+                      <div class="flex-shrink-0 mt-0.5">
+                        <div
+                          class="w-8 h-8 rounded-full flex items-center justify-center"
+                          :class="
+                            notification.type === 'success'
+                              ? 'bg-green-100 text-green-600'
+                              : notification.type === 'warning'
+                              ? 'bg-yellow-100 text-yellow-600'
+                              : 'bg-blue-100 text-blue-600'
+                          "
+                        >
+                          <svg
+                            v-if="notification.type === 'success'"
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                          <svg
+                            v-else-if="notification.type === 'warning'"
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                            ></path>
+                          </svg>
+                          <svg
+                            v-else
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            ></path>
+                          </svg>
+                        </div>
+                      </div>
+                      <div class="ml-3 flex-1">
+                        <p class="text-sm font-medium text-gray-900">
+                          {{ notification.title }}
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1">
+                          {{ notification.message }}
+                        </p>
+                        <p class="text-xs text-gray-400 mt-1">
+                          {{ notification.time }}
+                        </p>
+                      </div>
+                      <button
+                        @click="markAsRead(index)"
+                        v-if="!notification.read"
+                        class="ml-2 text-gray-400 hover:text-gray-600"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 13l4 4L19 7"
+                          ></path>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="px-4 py-3 border-t border-gray-100">
+                <NuxtLink
+                  to="#"
+                  class="block text-center text-sm text-green-500 hover:text-green-700 font-medium"
+                >
+                  View all notifications
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
 
           <!-- Student dropdown menu -->
           <div class="ml-3 relative">
             <div>
               <button
+                ref="profileBtnRef"
                 @click="toggleDropdown"
                 type="button"
                 class="flex items-center max-w-xs bg-white rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 p-1.5"
                 id="user-menu-button"
               >
                 <span class="sr-only">Open user menu</span>
+                <div
+                  v-if="user?.profile_picture_url"
+                  class="h-8 w-8 rounded-full bg-cover bg-center"
+                  :style="`background-image: url('${user.profile_picture_url}')`"
+                ></div>
                 <span
+                  v-else
                   class="bg-green-500 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold"
                 >
                   {{ userInitials }}
@@ -177,16 +375,40 @@
 
             <div
               v-if="isDropdownOpen"
+              ref="profileDropdownRef"
               class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-              @click.away="isDropdownOpen = false"
             >
-              <div class="px-4 py-3 border-b border-gray-100">
-                <p class="text-sm text-gray-500">Signed in as</p>
-                <p class="text-sm font-medium text-gray-800 truncate">
-                  {{ userName }}
-                </p>
+              <div
+                class="px-4 py-3 border-b border-gray-100 flex justify-between items-center"
+              >
+                <div>
+                  <p class="text-sm text-gray-500">Signed in as</p>
+                  <p class="text-sm font-medium text-gray-800 truncate">
+                    {{ userName }}
+                  </p>
+                </div>
+                <button
+                  @click="isDropdownOpen = false"
+                  class="text-gray-400 hover:text-gray-600"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    ></path>
+                  </svg>
+                </button>
               </div>
               <div class="pt-2">
+                <!-- Mahasiswa+ section commented out for now 
                 <div class="border-b border-gray-100 pb-2">
                   <p
                     class="px-4 text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -218,16 +440,17 @@
                     Kalender Finansial
                   </NuxtLink>
                 </div>
+                -->
               </div>
               <div class="py-1">
                 <NuxtLink
-                  to="#"
+                  to="/dashboard/profile"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Your Profile
                 </NuxtLink>
                 <NuxtLink
-                  to="#"
+                  to="/dashboard/profile?tab=settings"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
                   Settings
@@ -245,7 +468,7 @@
           <!-- Mobile menu button -->
           <div class="flex md:hidden ml-2">
             <button
-              @click="isMobileMenuOpen = !isMobileMenuOpen"
+              @click="toggleMobileMenu"
               type="button"
               class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-green-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-500"
               aria-controls="mobile-menu"
@@ -337,9 +560,54 @@
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
         >
-          Tantangan
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              ></path>
+            </svg>
+            <span>Tantangan</span>
+          </div>
         </NuxtLink>
 
+        <NuxtLink
+          to="/dashboard/chatbot"
+          class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
+          :class="[
+            $route.path.startsWith('/dashboard/chatbot')
+              ? 'text-green-500 bg-green-50'
+              : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
+          ]"
+        >
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+              ></path>
+            </svg>
+            <span>AI Assistant</span>
+          </div>
+        </NuxtLink>
+
+        <!-- Mahasiswa+ section commented out for now 
         <div class="border-t border-gray-200 mt-4 pt-4">
           <p
             class="px-3 text-xs font-medium text-gray-500 uppercase tracking-wider"
@@ -371,12 +639,15 @@
             Kalender Finansial
           </NuxtLink>
         </div>
+        -->
       </div>
     </div>
   </nav>
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted } from "vue";
+
 const $route = useRoute();
 const router = useRouter();
 const { user, logout: authLogout } = useAuth();
@@ -385,9 +656,137 @@ const { user, logout: authLogout } = useAuth();
 const isDropdownOpen = ref(false);
 const isMobileMenuOpen = ref(false);
 
+// Notification state
+const isNotificationsOpen = ref(false);
+const notifications = ref([
+  {
+    id: 1,
+    type: "success",
+    title: "Target tabungan tercapai!",
+    message: 'Anda telah mencapai target tabungan "Laptop baru".',
+    time: "5 menit yang lalu",
+    read: false,
+  },
+  {
+    id: 2,
+    type: "info",
+    title: "Pengingat pembayaran",
+    message: "Tagihan UKT akan jatuh tempo dalam 3 hari.",
+    time: "2 jam yang lalu",
+    read: false,
+  },
+  {
+    id: 3,
+    type: "warning",
+    title: "Perhatian anggaran",
+    message: "Anda telah menggunakan 80% dari anggaran makanan bulan ini.",
+    time: "Kemarin",
+    read: false,
+  },
+  {
+    id: 4,
+    type: "info",
+    title: "Tantangan baru tersedia",
+    message: 'Tantangan "Hemat 30 hari" telah tersedia untuk Anda.',
+    time: "2 hari yang lalu",
+    read: true,
+  },
+]);
+
+// Close dropdowns when clicking outside or pressing Escape
+const notificationRef = ref<HTMLElement | null>(null);
+const profileDropdownRef = ref<HTMLElement | null>(null);
+const notificationBtnRef = ref<HTMLElement | null>(null);
+const profileBtnRef = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener("click", handleDocumentClick);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keydown", handleKeyDown);
+  document.removeEventListener("click", handleDocumentClick);
+});
+
+const handleKeyDown = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+    isNotificationsOpen.value = false;
+    isDropdownOpen.value = false;
+  }
+};
+
+// Handle clicks on document to close dropdowns
+const handleDocumentClick = (event: MouseEvent) => {
+  // For notifications dropdown
+  if (
+    isNotificationsOpen.value &&
+    notificationRef.value &&
+    notificationBtnRef.value
+  ) {
+    // If clicking outside both the dropdown and its toggle button
+    if (
+      !notificationRef.value.contains(event.target as Node) &&
+      !notificationBtnRef.value.contains(event.target as Node)
+    ) {
+      isNotificationsOpen.value = false;
+    }
+  }
+
+  // For profile dropdown
+  if (isDropdownOpen.value && profileDropdownRef.value && profileBtnRef.value) {
+    // If clicking outside both the dropdown and its toggle button
+    if (
+      !profileDropdownRef.value.contains(event.target as Node) &&
+      !profileBtnRef.value.contains(event.target as Node)
+    ) {
+      isDropdownOpen.value = false;
+    }
+  }
+};
+
+// Toggle mobile menu
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  isNotificationsOpen.value = false;
+  isDropdownOpen.value = false;
+};
+
+// Toggle notification dropdown visibility
+const toggleNotifications = () => {
+  if (isNotificationsOpen.value) {
+    isNotificationsOpen.value = false;
+  } else {
+    isNotificationsOpen.value = true;
+    isDropdownOpen.value = false; // Close profile dropdown when opening notifications
+  }
+};
+
+// Check if there are unread notifications
+const hasUnreadNotifications = computed(() => {
+  return notifications.value.some((notification) => !notification.read);
+});
+
+// Mark a notification as read
+const markAsRead = (index: number) => {
+  notifications.value[index].read = true;
+};
+
+// Mark all notifications as read
+const markAllAsRead = () => {
+  notifications.value.forEach((notification) => {
+    notification.read = true;
+  });
+};
+
 // Toggle dropdown visibility
 const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
+  if (isDropdownOpen.value) {
+    isDropdownOpen.value = false;
+  } else {
+    isDropdownOpen.value = true;
+    isNotificationsOpen.value = false; // Close notifications when opening profile dropdown
+  }
 };
 
 // Get user's name and initials for display

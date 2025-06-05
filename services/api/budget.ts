@@ -42,10 +42,28 @@ export class BudgetService {
   /**
    * Get all budgets
    */
-  async getBudgets(): Promise<BudgetListResponse> {
-    const response = await this.apiClient.get<BudgetListResponse>(
-      this.ENDPOINTS.BUDGETS
-    );
+  async getBudgets(filters?: { category?: string; month_year?: string }): Promise<BudgetListResponse> {
+    let endpoint = this.ENDPOINTS.BUDGETS;
+    
+    // Add query parameters if filters are provided
+    if (filters) {
+      const queryParams = new URLSearchParams();
+      
+      if (filters.category && filters.category !== 'all') {
+        queryParams.append('category', filters.category);
+      }
+      
+      if (filters.month_year) {
+        queryParams.append('month_year', filters.month_year);
+      }
+      
+      const queryString = queryParams.toString();
+      if (queryString) {
+        endpoint += `?${queryString}`;
+      }
+    }
+    
+    const response = await this.apiClient.get<BudgetListResponse>(endpoint);
 
     if (response.error) {
       throw new Error(response.error.message);

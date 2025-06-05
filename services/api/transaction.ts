@@ -7,7 +7,7 @@ import type {
   TransactionDeleteResponse,
   TransactionRecurring,
   TransactionSummaryResponse,
-  TransactionUpdateRequest
+  TransactionUpdateRequest,
 } from "~/types/api";
 
 /**
@@ -46,9 +46,42 @@ export class TransactionService {
   /**
    * Get all transactions
    */
-  async getTransactions(): Promise<TransactionListResponse> {
+  async getTransactions(filters?: {
+    type?: string;
+    category?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Promise<TransactionListResponse> {
+    let endpoint = this.ENDPOINTS.TRANSACTIONS;
+
+    // Add query parameters if filters are provided
+    if (filters) {
+      const queryParams = new URLSearchParams();
+
+      if (filters.type && filters.type !== "all") {
+        queryParams.append("type", filters.type);
+      }
+
+      if (filters.category && filters.category !== "all") {
+        queryParams.append("category", filters.category);
+      }
+
+      if (filters.dateFrom) {
+        queryParams.append("dateFrom", filters.dateFrom);
+      }
+
+      if (filters.dateTo) {
+        queryParams.append("dateTo", filters.dateTo);
+      }
+
+      const queryString = queryParams.toString();
+      if (queryString) {
+        endpoint += `?${queryString}`;
+      }
+    }
+
     const response = await this.apiClient.get<TransactionListResponse>(
-      this.ENDPOINTS.TRANSACTIONS
+      endpoint
     );
 
     if (response.error) {
@@ -81,17 +114,20 @@ export class TransactionService {
     transactionData: TransactionUpdateRequest
   ): Promise<TransactionResponse> {
     // Make sure we're not sending empty objects for recurring
-    if (transactionData.recurring && Object.keys(transactionData.recurring).length === 0) {
+    if (
+      transactionData.recurring &&
+      Object.keys(transactionData.recurring).length === 0
+    ) {
       transactionData.recurring = null;
     }
-    
+
     // Clean up the data to remove any undefined or empty values
     const cleanData = Object.fromEntries(
       Object.entries(transactionData).filter(
         ([_, value]) => value !== undefined && value !== ""
       )
     );
-    
+
     const response = await this.apiClient.put<TransactionResponse>(
       `${this.ENDPOINTS.TRANSACTIONS}/${id}`,
       cleanData
@@ -107,7 +143,9 @@ export class TransactionService {
   /**
    * Delete a transaction
    */
-  async deleteTransaction(id: string | number): Promise<TransactionDeleteResponse> {
+  async deleteTransaction(
+    id: string | number
+  ): Promise<TransactionDeleteResponse> {
     const response = await this.apiClient.delete<TransactionDeleteResponse>(
       `${this.ENDPOINTS.TRANSACTIONS}/${id}`
     );

@@ -14,6 +14,7 @@ export interface User {
   phone: string;
   university: string;
   major: string;
+  profile_picture_url?: string | null;
   created_at: string;
   updated_at: string;
   role: string;
@@ -205,4 +206,262 @@ export interface UIBudget {
   remaining: number;
   month_year: string;
   notes: string;
+}
+
+/**
+ * Challenge types
+ */
+export interface Challenge {
+  id: string;
+  title: string;
+  description: string;
+  total_days: number;
+  target_amount: number;
+  color: string;
+  difficulty: number;
+  type: string;
+  targetText: string;
+  features: string[];
+}
+
+export interface ChallengeResponse {
+  status: boolean;
+  message: string;
+  data: Challenge;
+}
+
+export interface ChallengeListResponse {
+  status: boolean;
+  message: string;
+  data: Challenge[];
+}
+
+export interface ChallengeDeleteResponse {
+  status: boolean;
+  message: string;
+}
+
+// UI-specific challenge type for frontend display
+export interface UiChallenge {
+  id: string;
+  challenge_id: string;
+  title: string;
+  description: string;
+  duration: string;
+  difficulty: number;
+  category: string;
+  features: string[];
+  targetText: string;
+  color: string;
+}
+
+/*
+ * Active challenge types
+ */
+export interface ActiveChallenge {
+  id: string;
+  challenge_id: string;
+  title: string;
+  description: string;
+  progress: string;
+  percentComplete: number;
+  color: string;
+  savingsLabel: string;
+  savingsAmount: number;
+  actionText: string;
+  type: string;
+  checkInDescription: string;
+  duration: string;
+  difficulty: number;
+  targetAmount: number;
+  status: string;
+  startDate: string;
+  endDate: string;
+  features?: string[];
+  steps?: string[];
+  tips?: string[];
+  activityLog?: ChallengeActivity[];
+}
+
+export interface ChallengeActivity {
+  id: string;
+  action: string;
+  date: string;
+  amount?: number;
+  completed?: boolean;
+  difficulty?: number;
+  notes?: string;
+  shared?: boolean;
+}
+
+export interface ActiveChallengesResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge[];
+  meta: {
+    totalItems: number;
+    itemCount: number;
+    itemsPerPage: number;
+    totalPages: number;
+    currentPage: number;
+  };
+}
+
+/**
+ * Challenge Join Request/Response
+ */
+export interface ChallengeJoinRequest {
+  challenge_id: string;
+  goal: string;
+  start_date: string;
+}
+
+export interface ChallengeJoinResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge;
+}
+
+/**
+ * Challenge Check-In Request/Response
+ */
+export interface ChallengeCheckInRequest {
+  date: string;
+  amount?: number;
+  completed?: boolean;
+  difficulty: number;
+  notes?: string;
+  shareProgress: boolean;
+}
+
+export interface ChallengeCheckInResponse {
+  status: boolean;
+  message: string;
+  data: ActiveChallenge;
+}
+
+/**
+ * Profile types
+ */
+export interface UserProfile
+  extends Omit<User, "id" | "created_at" | "updated_at" | "role" | "email"> {
+  id?: string;
+  email?: string;
+}
+
+export interface UserPreferences {
+  notifications: {
+    email: boolean;
+    push: boolean;
+    budget: boolean;
+    challenges: boolean;
+  };
+  display: {
+    currency: string;
+    dateFormat: string;
+    theme: string;
+  };
+}
+
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface FinancialGoal {
+  id?: string;
+  name: string;
+  description: string;
+  target_amount: number;
+  current_amount: number;
+  target_date: string;
+}
+
+/**
+ * Profile response types
+ */
+export interface GetProfileResponse {
+  success: boolean;
+  data: UserProfile;
+}
+
+export interface UpdateProfileResponse {
+  success: boolean;
+  message: string;
+  data: UserProfile;
+}
+
+export interface UploadProfilePictureResponse {
+  success: boolean;
+  message: string;
+  data: {
+    profile_picture_url: string;
+  };
+}
+
+/**
+ * Dashboard types
+ */
+export interface DashboardSummary {
+  balance: number;
+  balanceChange: number;
+  income: number;
+  expenses: number;
+  remaining: number;
+  goalTarget: number;
+  goalProgress: number;
+}
+
+export interface DashboardPrediction {
+  predictedExpenses: number;
+  expenseChangePercent: number;
+  topExpenseCategory: string;
+  topExpensePercentage: number;
+  recommendedSavings: number;
+}
+
+export interface DailyTip {
+  title: string;
+  content: string;
+}
+
+export interface DashboardDataResponse {
+  status: boolean;
+  message: string;
+  data: {
+    summary: DashboardSummary;
+    prediction: DashboardPrediction;
+    tip: DailyTip;
+  };
+}
+
+// Stock analysis metrics data structure
+export interface StockAnalysisMetrics {
+  [key: string]: number; // All metrics are numbers with string keys
+}
+
+// Stock analysis result data structure
+export interface StockAnalysisResult {
+  avg_metrics: StockAnalysisMetrics;
+  recommendation: "Recommended" | "Not Recommended";
+}
+
+// Gemini chatbot interfaces
+export interface GeminiMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp?: Date;
+}
+
+export interface GeminiResponse {
+  message: string | null;
+  error: string | null;
+}
+
+export interface ChatConversation {
+  id: string;
+  title: string;
+  messages: GeminiMessage[];
+  createdAt: Date;
+  updatedAt: Date;
 }

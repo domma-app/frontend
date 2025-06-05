@@ -36,12 +36,20 @@
 
       <div class="flex items-center justify-between">
         <p class="font-medium text-gray-800">{{ challenge.targetText }}</p>
-        <button
-          @click="$emit('join', challenge.title)"
-          :class="`px-3 py-1 bg-${challenge.color}-500 hover:bg-${challenge.color}-600 text-white rounded transition-colors text-sm`"
-        >
-          Join
-        </button>
+        <div class="flex space-x-2">
+          <NuxtLink
+            :to="`/dashboard/challenges/${challenge.id}`"
+            class="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded transition-colors text-sm"
+          >
+            Details
+          </NuxtLink>
+          <button
+            @click="$emit('join', challenge.title)"
+            :class="`px-3 py-1 bg-${challenge.color}-500 hover:bg-${challenge.color}-600 text-white rounded transition-colors text-sm`"
+          >
+            Join
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -49,17 +57,18 @@
 
 <script setup lang="ts">
 interface CatalogChallenge {
-  id: string | number;
+  id: number;
   title: string;
   description: string;
   features: string[];
   targetText: string;
   color: string;
+  type?: "saving" | "spending" | "habit";
 }
 
 defineProps<{
   challenge: CatalogChallenge;
 }>();
 
-defineEmits(["join"]);
+defineEmits(["join", "view-details"]);
 </script>
