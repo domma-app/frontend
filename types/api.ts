@@ -396,7 +396,7 @@ export interface UploadProfilePictureResponse {
   message: string;
   data: {
     profile_picture_url: string;
-  }
+  };
 }
 
 /**
@@ -444,4 +444,24 @@ export interface StockAnalysisMetrics {
 export interface StockAnalysisResult {
   avg_metrics: StockAnalysisMetrics;
   recommendation: "Recommended" | "Not Recommended";
+}
+
+// Gemini chatbot interfaces
+export interface GeminiMessage {
+  role: "user" | "assistant";
+  content: string;
+  timestamp?: Date;
+}
+
+export interface GeminiResponse {
+  message: string | null;
+  error: string | null;
+}
+
+export interface ChatConversation {
+  id: string;
+  title: string;
+  messages: GeminiMessage[];
+  createdAt: Date;
+  updatedAt: Date;
 }

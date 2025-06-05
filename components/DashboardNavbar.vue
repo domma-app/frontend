@@ -132,6 +132,34 @@
                 <span>Tantangan</span>
               </div>
             </NuxtLink>
+
+            <NuxtLink
+              to="/dashboard/chatbot"
+              class="px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
+              :class="[
+                $route.path.startsWith('/dashboard/chatbot')
+                  ? 'text-green-500 bg-green-50'
+                  : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
+              ]"
+            >
+              <div class="flex items-center">
+                <svg
+                  class="w-5 h-5 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  ></path>
+                </svg>
+                <span>AI Assistant</span>
+              </div>
+            </NuxtLink>
           </div>
         </div>
 
@@ -552,10 +580,10 @@
         </NuxtLink>
 
         <NuxtLink
-          to="/dashboard/forum"
+          to="/dashboard/chatbot"
           class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
           :class="[
-            $route.path.startsWith('/dashboard/forum')
+            $route.path.startsWith('/dashboard/chatbot')
               ? 'text-green-500 bg-green-50'
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
@@ -572,10 +600,10 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 stroke-width="2"
-                d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
               ></path>
             </svg>
-            <span>Forum</span>
+            <span>AI Assistant</span>
           </div>
         </NuxtLink>
 

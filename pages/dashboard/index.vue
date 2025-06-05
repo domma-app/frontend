@@ -54,7 +54,7 @@ definePageMeta({
 const dashboardData = ref({
   summary: {
     balance: 125000,
-    balanceChange: 8,
+    balanceChange: 0,
     income: 40000,
     expenses: 10000,
     remaining: 30000,
@@ -83,10 +83,37 @@ onMounted(async () => {
 
     // Update the dashboard data with the response
     if (response && response.data) {
-      dashboardData.value = response.data;
+      // Make sure all required fields exist
+      const summary = {
+        balance:
+          response.data.summary?.balance ?? dashboardData.value.summary.balance,
+        balanceChange: response.data.summary?.balanceChange ?? 0,
+        income:
+          response.data.summary?.income ?? dashboardData.value.summary.income,
+        expenses:
+          response.data.summary?.expenses ??
+          dashboardData.value.summary.expenses,
+        remaining:
+          response.data.summary?.remaining ??
+          dashboardData.value.summary.remaining,
+        goalTarget:
+          response.data.summary?.goalTarget ??
+          dashboardData.value.summary.goalTarget,
+        goalProgress:
+          response.data.summary?.goalProgress ??
+          dashboardData.value.summary.goalProgress,
+      };
+
+      // Update the dashboard data
+      dashboardData.value = {
+        summary,
+        prediction: response.data.prediction || dashboardData.value.prediction,
+        tip: response.data.tip || dashboardData.value.tip,
+      };
     }
   } catch (error) {
     console.error("Error fetching dashboard data:", error);
+    // Could add toast notification or other UI feedback here
   }
 });
 </script>

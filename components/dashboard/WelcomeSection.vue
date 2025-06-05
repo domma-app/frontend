@@ -74,6 +74,23 @@
               </svg>
               {{ Math.abs(summaryData.balanceChange) }}%
             </span>
+            <span class="text-gray-500 flex items-center" v-else>
+              <svg
+                class="w-4 h-4 mr-1"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 12h14"
+                ></path>
+              </svg>
+              No change
+            </span>
             <span class="text-gray-500 ml-2">from last month</span>
           </div>
         </div>
@@ -151,7 +168,7 @@ const { user } = useAuth();
 
 // Get user's name for display
 const userName = computed(() => {
-  return user.value?.full_name || "Student";
+  return user.value?.full_name || "User";
 });
 
 // Helper function to format currency

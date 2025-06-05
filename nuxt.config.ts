@@ -19,6 +19,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     // apiSecret: "", // can be overridden by NUXT_API_SECRET environment variable
+    geminiApiKey: process.env.NUXT_GEMINI_API_KEY || "", // Can be overridden by NUXT_GEMINI_API_KEY
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL, // can be overridden by NUXT_PUBLIC_API_BASE environment variable
     },

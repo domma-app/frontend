@@ -25,7 +25,7 @@
       </NuxtLink>
 
       <NuxtLink
-        to="#"
+        to="/dashboard/chatbot"
         class="flex flex-col items-center justify-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
       >
         <svg
@@ -39,10 +39,10 @@
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
           ></path>
         </svg>
-        <span class="text-sm text-gray-700">View Reports</span>
+        <span class="text-sm text-gray-700">AI Assistant</span>
       </NuxtLink>
 
       <NuxtLink
