@@ -1,6 +1,6 @@
 # DOMMA: Dompet Mahasiswa (Student Wallet)
 
-![DOMMA Logo](https://github.com/user-attachments/assets/7699c1df-1892-4325-8d83-3bf89d3f33dc)
+...
 
 ## Overview
 
@@ -29,9 +29,18 @@ DOMMA (Dompet Mahasiswa) is a financial management application designed specific
 
 ## Requirements
 
-- Node.js (v14.x or higher)
-- npm or yarn
+- **Node.js v22.14.0 or higher**
+- npm
 - Modern web browser
+
+> ⚠️ The project **does not work reliably** on Node.js 20.x or below. Make sure you're using **Node.js v22.14.0+** before proceeding.
+
+You can use tools like [nvm](https://github.com/nvm-sh/nvm) to manage Node.js versions:
+
+```bash
+nvm install 22.14.0
+nvm use 22.14.0
+```
 
 ## Installation & Setup
 
@@ -46,28 +55,22 @@ DOMMA (Dompet Mahasiswa) is a financial management application designed specific
 
    ```bash
    npm install
-   # or using yarn
-   yarn install
    ```
 
 3. Set up environment variables:
    Create a `.env` file in the frontend directory with the following variables:
 
    ```
-
    NUXT_PUBLIC_API_BASE_URL=http://localhost:3000/api
    NUXT_PUBLIC_GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
    NUXT_GEMINI_API_KEY="<YOUR_GEMINI_API_KEY>"
    NUXT_PUBLIC_STOCK_API_URL=https://your-stock-api-url
-
    ```
 
 4. Start the development server:
 
    ```bash
    npm run dev
-   # or using yarn
-   yarn dev
    ```
 
 5. Open your browser and navigate to `http://localhost:3000`
@@ -77,15 +80,10 @@ DOMMA (Dompet Mahasiswa) is a financial management application designed specific
 ```bash
 # Generate static files
 npm run generate
-# or
-yarn generate
 
 # Build for production and launch server
 npm run build
 npm run start
-# or
-yarn build
-yarn start
 ```
 
 ## Deployment
