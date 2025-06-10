@@ -22,6 +22,7 @@ export default defineNuxtConfig({
     geminiApiKey: process.env.NUXT_GEMINI_API_KEY || "", // Can be overridden by NUXT_GEMINI_API_KEY
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL, // can be overridden by NUXT_PUBLIC_API_BASE environment variable
+      stockBaseUrl: process.env.NUXT_PUBLIC_STOCK_API_URL,
     },
   },
   pwa: {

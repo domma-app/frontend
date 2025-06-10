@@ -431,7 +431,7 @@ const agreeToTerms = ref(false);
 const isLoading = ref(false);
 const error = ref("");
 const router = useRouter();
-const { register } = useAuth();
+const { register, login } = useAuth();
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 
@@ -509,12 +509,28 @@ const handleRegister = async () => {
     });
 
     // Show success toast
-    showSuccessToast("Registration successful!");
+    showSuccessToast("Registration successful! Logging you in...");
 
-    // Redirect to login page after a short delay
-    setTimeout(() => {
-      router.push("/login");
-    }, 1500);
+    try {
+      // Immediately login after successful registration
+      await login({
+        email: email.value,
+        password: password.value,
+        rememberMe: true,
+      });
+
+      // Redirect to dashboard after successful login
+      router.push("/dashboard");
+    } catch (loginErr: any) {
+      // If login fails, still show success for registration but redirect to login page
+      console.error("Auto-login failed:", loginErr);
+      showSuccessToast("Registration successful! Please log in.");
+
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        router.push("/login");
+      }, 1500);
+    }
   } catch (err: any) {
     error.value = err.message || "Registration failed. Please try again.";
   } finally {

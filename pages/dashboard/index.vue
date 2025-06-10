@@ -3,6 +3,11 @@
     <!-- Welcome section -->
     <WelcomeSection :summary-data="dashboardData.summary" />
 
+    <!-- Stock Analysis section - Moved to top and made more prominent -->
+    <div class="mb-6">
+      <StockAnalyzer :highlight="true" />
+    </div>
+
     <!-- Prediction section -->
     <PredictionSection :prediction-data="dashboardData.prediction" />
 
@@ -13,11 +18,6 @@
 
       <!-- Budget progress -->
       <BudgetProgress />
-    </div>
-
-    <!-- Stock Analysis section -->
-    <div class="mb-6">
-      <StockAnalyzer />
     </div>
 
     <!-- Quick actions and tips section -->

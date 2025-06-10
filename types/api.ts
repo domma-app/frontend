@@ -443,7 +443,7 @@ export interface StockAnalysisMetrics {
 // Stock analysis result data structure
 export interface StockAnalysisResult {
   avg_metrics: StockAnalysisMetrics;
-  recommendation: "Recommended" | "Not Recommended";
+  "rekomendasi (%)": number;
 }
 
 // Gemini chatbot interfaces
