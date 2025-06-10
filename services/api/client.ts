@@ -5,6 +5,7 @@ import type { ApiResponse } from "~/types/api";
  */
 export class ApiClient {
   private baseUrl: string;
+  private authFailed: boolean = false;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
@@ -21,16 +22,18 @@ export class ApiClient {
 
     // Default headers
     const headers: Record<string, string> = {
-      ...options.headers as Record<string, string>,
+      ...(options.headers as Record<string, string>),
     };
-    
+
     // Add Content-Type header only if not sending FormData
     if (!(options.body instanceof FormData)) {
       headers["Content-Type"] = "application/json";
     }
 
     // Add authentication token if available
-    const token = localStorage.getItem("auth_access_token") || sessionStorage.getItem("auth_access_token");
+    const token =
+      localStorage.getItem("auth_access_token") ||
+      sessionStorage.getItem("auth_access_token");
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
       console.log("Adding auth token to request:", endpoint);
@@ -48,11 +51,24 @@ export class ApiClient {
       console.log("Making API request to:", url);
       const response = await fetch(url, requestOptions);
       const data = await response.json();
+
+      // Check for authentication errors
+      if (response.status === 401 || response.status === 403) {
+        console.warn("Authentication failed:", response.status, data);
+        this.handleAuthError();
+        return {
+          error: {
+            message: data.message || "Authentication failed",
+            status: response.status,
+          },
+        };
+      }
+
       if (!response.ok) {
         console.error("API request failed:", {
           url,
           status: response.status,
-          data
+          data,
         });
         return {
           error: {
@@ -72,6 +88,32 @@ export class ApiClient {
         },
       };
     }
+  }
+
+  /**
+   * Handle authentication errors by logging the user out
+   */
+  private handleAuthError() {
+    // Prevent multiple logout attempts
+    if (this.authFailed) return;
+
+    this.authFailed = true;
+    console.warn("Authentication token invalid or expired. Logging out...");
+
+    // Clear auth data from storage
+    localStorage.removeItem("auth_access_token");
+    localStorage.removeItem("auth_refresh_token");
+    localStorage.removeItem("auth_user");
+    localStorage.removeItem("auth_token_expiry");
+    sessionStorage.removeItem("auth_access_token");
+    sessionStorage.removeItem("auth_refresh_token");
+    sessionStorage.removeItem("auth_user");
+    sessionStorage.removeItem("auth_token_expiry");
+
+    // Navigate to login page on next tick
+    setTimeout(() => {
+      window.location.href = "/login?session_expired=true";
+    }, 0);
   }
 
   /**

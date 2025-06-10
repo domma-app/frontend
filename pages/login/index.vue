@@ -262,12 +262,21 @@ const showPassword = ref(false);
 // Toast state (only for success)
 const showToast = ref(false);
 const toastMessage = ref("");
-const toastType = ref<"success">("success");
+const toastType = ref<"success" | "error">("success");
 const toastTimeout = ref<number | null>(null);
 
 // Get redirect path from query params if it exists
 const redirectPath = computed(() => {
   return (route.query.redirect as string) || "/dashboard";
+});
+
+// Check for session expired query parameter
+onMounted(() => {
+  if (route.query.session_expired === "true") {
+    toastType.value = "error";
+    toastMessage.value = "Your session has expired. Please log in again.";
+    showToast.value = true;
+  }
 });
 
 // Show success toast notification
@@ -279,6 +288,7 @@ const showSuccessToast = (message: string) => {
 
   // Set toast content
   toastMessage.value = message;
+  toastType.value = "success";
   showToast.value = true;
 
   // Auto dismiss after 5 seconds
