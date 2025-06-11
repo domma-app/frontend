@@ -1,6 +1,6 @@
 # DOMMA: Dompet Mahasiswa (Student Wallet)
 
-![Frame 36](https://github.com/user-attachments/assets/e42eb84f-2cae-46da-adf0-dedfb268acc0)
+![Frame 36 (1)](https://github.com/user-attachments/assets/379a46cd-8a44-45d8-8418-dc3413a1e0f4)
 
 ## Overview
 
