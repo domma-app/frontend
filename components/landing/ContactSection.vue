@@ -113,7 +113,7 @@
             <div class="sm:col-span-2">
               <button
                 type="submit"
-                class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-500 hover:outline hover:outline-offset-2 hover:outline-green-500 transition-all"
+                class="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-500 transition-all"
               >
                 Send Message
               </button>

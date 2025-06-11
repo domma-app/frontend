@@ -18,13 +18,13 @@
           <div class="mt-8 flex flex-wrap gap-4">
             <NuxtLink
               to="/register"
-              class="inline-block px-8 py-3.5 text-base font-medium rounded-md text-white bg-green-500 hover:outline hover:outline-offset-2 hover:outline-green-500 transition-all"
+              class="inline-block px-8 py-3.5 text-base font-medium rounded-md text-white bg-green-500 hover:outline hover:outline-green-500 transition-all"
             >
               Get Started for Free
             </NuxtLink>
             <NuxtLink
               to="/login"
-              class="inline-block px-8 py-3.5 text-base font-medium rounded-md text-gray-700 bg-gray-100 border border-gray-200 hover:outline hover:outline-offset-2 hover:outline-gray-300 transition-all"
+              class="inline-block px-8 py-3.5 text-base font-medium rounded-md text-gray-700 bg-gray-100 border border-gray-200 hover:outline hover:outline-gray-300 transition-all"
             >
               Sign In
             </NuxtLink>

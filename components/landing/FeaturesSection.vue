@@ -32,7 +32,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
         <!-- Combined ML feature card -->
         <div
-          class="bg-white border border-gray-200 rounded-md p-8 fade-in hover:outline hover:outline-offset-4 hover:outline-green-200 transition-all"
+          class="bg-white border border-gray-200 rounded-md p-8 fade-in transition-all"
           style="animation-delay: 0.7s"
         >
           <div class="flex flex-col items-start">
@@ -68,7 +68,7 @@
 
         <!-- Expense Tracking -->
         <div
-          class="bg-white border border-gray-200 rounded-md p-8 fade-in hover:outline hover:outline-offset-4 hover:outline-green-200 transition-all"
+          class="bg-white border border-gray-200 rounded-md p-8 fade-in transition-all"
           style="animation-delay: 0.8s"
         >
           <div class="flex flex-col items-start">
@@ -103,7 +103,7 @@
 
         <!-- Budget Management -->
         <div
-          class="bg-white border border-gray-200 rounded-md p-8 fade-in hover:outline hover:outline-offset-4 hover:outline-green-200 transition-all"
+          class="bg-white border border-gray-200 rounded-md p-8 fade-in transition-all"
           style="animation-delay: 0.9s"
         >
           <div class="flex flex-col items-start">
@@ -138,7 +138,7 @@
 
         <!-- Stock Analysis -->
         <div
-          class="bg-white border border-gray-200 rounded-md p-8 fade-in hover:outline hover:outline-offset-4 hover:outline-green-200 transition-all"
+          class="bg-white border border-gray-200 rounded-md p-8 fade-in transition-all"
           style="animation-delay: 1s"
         >
           <div class="flex flex-col items-start">
@@ -172,7 +172,7 @@
 
         <!-- Financial Insights -->
         <div
-          class="bg-white border border-gray-200 rounded-md p-8 fade-in hover:outline hover:outline-offset-4 hover:outline-green-200 transition-all"
+          class="bg-white border border-gray-200 rounded-md p-8 fade-in transition-all"
           style="animation-delay: 1.1s"
         >
           <div class="flex flex-col items-start">
@@ -207,7 +207,7 @@
 
         <!-- Challenges -->
         <div
-          class="bg-white border border-gray-200 rounded-md p-8 fade-in hover:outline hover:outline-offset-4 hover:outline-green-200 transition-all"
+          class="bg-white border border-gray-200 rounded-md p-8 fade-in transition-all"
           style="animation-delay: 1.2s"
         >
           <div class="flex flex-col items-start">

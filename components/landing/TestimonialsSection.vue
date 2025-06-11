@@ -1,6 +1,6 @@
 <template>
   <section id="testimonials" class="py-20 relative">
-    <div class="container mx-auto">
+    <div class="container mx-auto px-4">
       <div
         class="text-center max-w-3xl mx-auto mb-16 fade-in"
         style="animation-delay: 0.7s"
@@ -17,7 +17,55 @@
         </p>
       </div>
 
-      <div class="relative">
+      <!-- Mobile View: Stacked testimonials -->
+      <div class="sm:hidden space-y-6">
+        <div
+          v-for="(testimonial, index) in testimonials"
+          :key="index"
+          class="bg-white border border-gray-200 rounded-md p-4 h-full flex flex-col transition-all"
+        >
+          <div class="flex items-center mb-4">
+            <div
+              class="h-12 w-12 rounded-full bg-gray-100 flex items-center justify-center text-xl font-bold text-gray-600"
+            >
+              {{ testimonial.name.charAt(0) }}
+            </div>
+            <div class="ml-3">
+              <h4 class="text-base font-bold text-gray-900">
+                {{ testimonial.name }}
+              </h4>
+              <p class="text-xs text-gray-600">
+                {{ testimonial.role }}
+              </p>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="flex space-x-1">
+              <svg
+                v-for="i in 5"
+                :key="i"
+                class="w-4 h-4"
+                :class="
+                  i <= testimonial.rating ? 'text-yellow-400' : 'text-gray-300'
+                "
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+                ></path>
+              </svg>
+            </div>
+          </div>
+          <p class="text-gray-600 text-sm flex-grow">
+            {{ testimonial.text }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Tablet/Desktop View: Carousel -->
+      <div class="relative hidden sm:block">
         <!-- Testimonial Carousel -->
         <div
           class="testimonial-carousel relative overflow-hidden"
@@ -26,18 +74,18 @@
           <div
             class="carousel-inner flex transition-transform duration-1000 ease-in-out"
             :style="{
-              transform: `translateX(-${currentSlide * (100 / 3)}%)`,
-              width: `${testimonials.length * (100 / 3)}%`,
+              transform: `translateX(-${currentSlide * (100 / itemsPerView)}%)`,
+              width: `${testimonials.length * (100 / itemsPerView)}%`,
             }"
           >
             <div
               v-for="(testimonial, index) in testimonials"
               :key="index"
               class="carousel-item flex-shrink-0 px-2"
-              :style="{ width: `${100 / 3}%` }"
+              :style="{ width: `${100 / itemsPerView}%` }"
             >
               <div
-                class="bg-white border border-gray-200 rounded-md p-8 h-full flex flex-col transition-all"
+                class="bg-white border border-gray-200 rounded-md p-6 md:p-8 h-full flex flex-col transition-all"
               >
                 <div class="flex items-center mb-6">
                   <div
@@ -75,7 +123,7 @@
                     </svg>
                   </div>
                 </div>
-                <p class="text-gray-600 text-lg flex-grow">
+                <p class="text-gray-600 text-base md:text-lg flex-grow">
                   {{ testimonial.text }}
                 </p>
               </div>
@@ -86,7 +134,9 @@
         <!-- Carousel indicators -->
         <div class="flex justify-center mt-8">
           <button
-            v-for="(_, index) in Math.ceil(testimonials.length - 2)"
+            v-for="(_, index) in Math.ceil(
+              testimonials.length - (itemsPerView - 1)
+            )"
             :key="index"
             @click="setSlide(index)"
             class="w-3 h-3 mx-1 rounded-full transition-colors"
@@ -97,13 +147,13 @@
     </div>
 
     <!-- Down arrow -->
-    <div class="flex justify-center mt-16">
+    <div class="flex justify-center mt-10 sm:mt-16">
       <button
         @click="scrollToNextSection"
         class="animate-bounce bg-white border border-gray-200 rounded-full p-2 hover:border-green-500 transition-colors"
       >
         <svg
-          class="w-6 h-6 text-green-500"
+          class="w-5 h-5 sm:w-6 sm:h-6 text-green-500"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -122,6 +172,8 @@
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+
 // Testimonial data
 const testimonials = [
   {
@@ -150,11 +202,30 @@ const testimonials = [
   },
 ];
 
+// Responsive items per view
+const windowWidth = ref(
+  typeof window !== "undefined" ? window.innerWidth : 1200
+);
+
+// Items per view based on screen size
+const itemsPerView = computed(() => {
+  if (windowWidth.value < 1024) return 2; // Tablet: 2 items
+  return 3; // Desktop: 3 items
+});
+
+// Update window width on resize
+const updateWindowWidth = () => {
+  windowWidth.value = window.innerWidth;
+};
+
 // Carousel functionality
 const currentSlide = ref(0);
 const carouselInterval = ref<ReturnType<typeof setInterval> | null>(null);
 
 onMounted(() => {
+  // Listen for window resize
+  window.addEventListener("resize", updateWindowWidth);
+
   // Auto-sliding carousel
   carouselInterval.value = setInterval(() => {
     nextSlide();
@@ -162,13 +233,16 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
+  // Clean up
+  window.removeEventListener("resize", updateWindowWidth);
   if (carouselInterval.value) {
     clearInterval(carouselInterval.value);
   }
 });
 
 const nextSlide = () => {
-  currentSlide.value = (currentSlide.value + 1) % (testimonials.length - 2);
+  currentSlide.value =
+    (currentSlide.value + 1) % (testimonials.length - (itemsPerView.value - 1));
 };
 
 const setSlide = (index: number) => {
