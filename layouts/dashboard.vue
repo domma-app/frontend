@@ -5,6 +5,8 @@
       <slot />
     </main>
     <Footer />
+    <!-- Floating ChatBot button -->
+    <ChatBot />
   </div>
 </template>
 

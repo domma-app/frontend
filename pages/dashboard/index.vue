@@ -1,10 +1,24 @@
 <template>
   <div>
+    <!-- Quick Action Buttons at the top of the dashboard -->
+    <QuickActionButtons />
+
     <!-- Welcome section -->
     <WelcomeSection :summary-data="dashboardData.summary" />
 
-    <!-- Prediction section -->
-    <PredictionSection :prediction-data="dashboardData.prediction" />
+    <!-- Stock Analysis section - Moved to top and made more prominent -->
+    <div class="mb-6">
+      <StockAnalyzer :highlight="true" />
+    </div>
+
+    <!-- Expenditure Classification and Forecast in a 2-column layout -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Expenditure Classification -->
+      <ExpenditureClassifier :initial-amount="dashboardData.summary.expenses" />
+
+      <!-- Expenditure Forecast -->
+      <ExpenditureForecast />
+    </div>
 
     <!-- Recent transactions and budgets section -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -15,16 +29,8 @@
       <BudgetProgress />
     </div>
 
-    <!-- Stock Analysis section -->
-    <div class="mb-6">
-      <StockAnalyzer />
-    </div>
-
-    <!-- Quick actions and tips section -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Quick actions -->
-      <QuickActions />
-
+    <!-- Daily tips section -->
+    <div class="grid grid-cols-1 gap-6">
       <!-- Daily tips and quotes -->
       <DailyTips :daily-tip="dashboardData.tip" />
     </div>
@@ -34,15 +40,15 @@
 <script setup lang="ts">
 import { useDashboardService } from "~/services";
 import WelcomeSection from "~/components/dashboard/WelcomeSection.vue";
-import PredictionSection from "~/components/dashboard/PredictionSection.vue";
 import RecentTransactions from "~/components/dashboard/RecentTransactions.vue";
 import BudgetProgress from "~/components/dashboard/BudgetProgress.vue";
-import QuickActions from "~/components/dashboard/QuickActions.vue";
 import DailyTips from "~/components/dashboard/DailyTips.vue";
 import StockAnalyzer from "~/components/dashboard/StockAnalyzer.vue";
+import QuickActionButtons from "~/components/dashboard/QuickActionButtons.vue";
+import ExpenditureClassifier from "~/components/dashboard/ExpenditureClassifier.vue";
+import ExpenditureForecast from "~/components/dashboard/ExpenditureForecast.vue";
 import type {
   DashboardSummary,
-  DashboardPrediction,
   DailyTip,
 } from "~/types/api";
 
@@ -61,13 +67,6 @@ const dashboardData = ref({
     goalTarget: 1000000,
     goalProgress: 65,
   } as DashboardSummary,
-  prediction: {
-    predictedExpenses: 82000,
-    expenseChangePercent: 9.3,
-    topExpenseCategory: "Housing",
-    topExpensePercentage: 35,
-    recommendedSavings: 300000,
-  } as DashboardPrediction,
   tip: {
     title: "The 50/30/20 Rule for Student Budgeting",
     content:
@@ -107,7 +106,6 @@ onMounted(async () => {
       // Update the dashboard data
       dashboardData.value = {
         summary,
-        prediction: response.data.prediction || dashboardData.value.prediction,
         tip: response.data.tip || dashboardData.value.tip,
       };
     }

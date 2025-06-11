@@ -443,7 +443,7 @@ export interface StockAnalysisMetrics {
 // Stock analysis result data structure
 export interface StockAnalysisResult {
   avg_metrics: StockAnalysisMetrics;
-  recommendation: "Recommended" | "Not Recommended";
+  "rekomendasi (%)": number;
 }
 
 // Gemini chatbot interfaces
@@ -464,4 +464,52 @@ export interface ChatConversation {
   messages: GeminiMessage[];
   createdAt: Date;
   updatedAt: Date;
+}
+
+/**
+ * Expenditure Classification types
+ */
+export interface ExpenditureClassification {
+  amount: number;
+  cluster: number;
+  category: string;
+  message: string;
+  emoji: string;
+}
+
+export interface ExpenditureClassificationRequest {
+  amount: string | number;
+}
+
+/**
+ * Expenditure Forecasting types
+ */
+export interface WeeklyForecast {
+  [key: string]: number; // e.g. "Week-5": 162500.0
+}
+
+export interface MonthlyForecast {
+  [key: string]: number; // e.g. "June": 1500000.0
+}
+
+export interface WeeklyForecastRequest {
+  duration: "4_weeks";
+  forecast: {
+    [key: string]: number; // e.g. "Weeks-1": 100000
+  };
+}
+
+export interface MonthlyForecastRequest {
+  duration: "6_months";
+  forecast: {
+    [key: string]: number; // e.g. "December": 1500000
+  };
+}
+
+export interface ForecastResponse {
+  duration: "4_weeks" | "6_months";
+  input_forecast: {
+    [key: string]: number;
+  };
+  future_forecast: WeeklyForecast | MonthlyForecast;
 }

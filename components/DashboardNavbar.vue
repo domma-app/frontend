@@ -49,19 +49,6 @@
                   : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
               ]"
             >
-              <!-- <svg
-                class="w-5 h-5 mr-1.5"
-                fill="none"
-                stroke="currentColor"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 9l-7 7-3-3m0 0l.94-2.06L4.03 13.8l1.9-1.9 2.07-.93m10 6.87l-2.53-4.2-1.47.79 2.53 4.2M5 3l4 2m0 0L5 9m4-4l8 8"
-                ></path>
-              </svg> -->
               <svg
                 class="w-5 h-5 mr-1.5"
                 fill="none"
@@ -130,34 +117,6 @@
                   ></path>
                 </svg>
                 <span>Tantangan</span>
-              </div>
-            </NuxtLink>
-
-            <NuxtLink
-              to="/dashboard/chatbot"
-              class="px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
-              :class="[
-                $route.path.startsWith('/dashboard/chatbot')
-                  ? 'text-green-500 bg-green-50'
-                  : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
-              ]"
-            >
-              <div class="flex items-center">
-                <svg
-                  class="w-5 h-5 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-                  ></path>
-                </svg>
-                <span>AI Assistant</span>
               </div>
             </NuxtLink>
           </div>
@@ -447,12 +406,6 @@
                   to="/dashboard/profile"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 >
-                  Your Profile
-                </NuxtLink>
-                <NuxtLink
-                  to="/dashboard/profile?tab=settings"
-                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                >
                   Settings
                 </NuxtLink>
                 <button
@@ -517,7 +470,7 @@
       class="md:hidden border-t border-gray-100"
       id="mobile-menu"
     >
-      <div class="px-2 pt-2 pb-3 space-y-1">
+      <div class="px-2 pt-3 pb-3 space-y-1">
         <NuxtLink
           to="/dashboard"
           class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
@@ -527,7 +480,23 @@
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
         >
-          Dashboard
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              ></path>
+            </svg>
+            <span>Dashboard</span>
+          </div>
         </NuxtLink>
         <NuxtLink
           to="/dashboard/transaction"
@@ -538,7 +507,23 @@
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
         >
-          Transaksi
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+              ></path>
+            </svg>
+            <span>Transaksi</span>
+          </div>
         </NuxtLink>
         <NuxtLink
           to="/dashboard/budget"
@@ -549,7 +534,23 @@
               : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
           ]"
         >
-          Anggaran
+          <div class="flex items-center">
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+            <span>Anggaran</span>
+          </div>
         </NuxtLink>
         <NuxtLink
           to="/dashboard/challenges"
@@ -576,34 +577,6 @@
               ></path>
             </svg>
             <span>Tantangan</span>
-          </div>
-        </NuxtLink>
-
-        <NuxtLink
-          to="/dashboard/chatbot"
-          class="block px-3 py-2 rounded-md text-base font-medium transition-colors"
-          :class="[
-            $route.path.startsWith('/dashboard/chatbot')
-              ? 'text-green-500 bg-green-50'
-              : 'text-gray-700 hover:text-green-500 hover:bg-gray-50',
-          ]"
-        >
-          <div class="flex items-center">
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
-              ></path>
-            </svg>
-            <span>AI Assistant</span>
           </div>
         </NuxtLink>
 
