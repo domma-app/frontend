@@ -1,5 +1,5 @@
 <template>
-  <nav class="bg-white shadow">
+  <nav class="bg-white border-b border-gray-100 fixed top-0 w-full z-50">
     <div class="container mx-auto px-4">
       <div class="flex justify-between h-16">
         <!-- Logo and brand -->
@@ -92,4 +92,41 @@
 
 <script setup lang="ts">
 const isMobileMenuOpen = ref(false);
+const activeSection = ref("");
+
+const scrollToSection = (sectionId: string) => {
+  const element = document.getElementById(sectionId);
+  if (element) {
+    element.scrollIntoView({ behavior: "smooth" });
+    activeSection.value = sectionId;
+  }
+};
+
+// Track active section while scrolling
+onMounted(() => {
+  const sections = ["features", "testimonials", "about", "faq", "contact"];
+
+  const observerOptions = {
+    root: null,
+    rootMargin: "-80px 0px -80px 0px",
+    threshold: 0.1,
+  };
+
+  const observerCallback = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        activeSection.value = entry.target.id;
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+  sections.forEach((sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      observer.observe(element);
+    }
+  });
+});
 </script>
