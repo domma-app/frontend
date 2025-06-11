@@ -23,6 +23,10 @@ export default defineNuxtConfig({
     public: {
       apiBaseUrl: process.env.NUXT_PUBLIC_API_BASE_URL, // can be overridden by NUXT_PUBLIC_API_BASE environment variable
       stockBaseUrl: process.env.NUXT_PUBLIC_STOCK_API_URL,
+      expenditureClassificationBaseUrl:
+        process.env.NUXT_PUBLIC_EXPENDITURE_CLASSIFICATION_API_URL,
+      expenditureForecastingBaseUrl:
+        process.env.NUXT_PUBLIC_EXPENDITURE_FORECASTING_API_URL,
     },
   },
   pwa: {

@@ -65,6 +65,8 @@ nvm use 22.14.0
    NUXT_PUBLIC_GEMINI_API_URL="https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
    NUXT_GEMINI_API_KEY="<YOUR_GEMINI_API_KEY>"
    NUXT_PUBLIC_STOCK_API_URL=https://your-stock-api-url
+   NUXT_PUBLIC_EXPENDITURE_CLASSIFICATION_API_URL="https://your-ml-expenditure-classification-api.hf.space"
+   NUXT_PUBLIC_EXPENDITURE_FORECASTING_API_URL="https://your-ml-expenditure-forecasting.hf.space"
    ```
 
 4. Start the development server:
