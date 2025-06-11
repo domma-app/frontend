@@ -101,7 +101,7 @@
             <div
               v-for="(value, key) in weeklyForecast.future_forecast"
               :key="key"
-              class="bg-gradient-to-b from-blue-50 to-blue-100 p-3 rounded-lg shadow-sm border border-blue-200"
+              class="bg-blue-50 p-3 rounded-lg"
             >
               <p class="text-xs text-blue-600 font-medium">{{ key }}</p>
               <p class="text-lg font-semibold text-gray-800">
@@ -160,7 +160,7 @@
             <div
               v-for="(value, key) in monthlyForecast.future_forecast"
               :key="key"
-              class="bg-gradient-to-b from-purple-50 to-purple-100 p-4 rounded-lg shadow-sm border border-purple-200"
+              class="bg-purple-50 p-4 rounded-lg"
             >
               <div class="flex items-center justify-between">
                 <div>

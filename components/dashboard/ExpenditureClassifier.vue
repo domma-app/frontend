@@ -27,7 +27,7 @@
       <!-- Classification Result -->
       <div
         v-if="classification"
-        class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 mb-4 border-l-4"
+        class="bg-green-50 rounded-lg p-6 mb-4 border-l-4"
         :class="getBorderClass"
       >
         <div class="flex items-center justify-between">

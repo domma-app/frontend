@@ -2,21 +2,13 @@
   <div
     class="bg-white rounded-lg shadow-sm p-3 mb-4 overflow-x-auto max-w-lg mx-auto md:hidden"
   >
-    <!-- <div class="text-center mb-2">
-      <h2 class="text-sm font-semibold text-gray-600 flex items-center justify-center">
-        <svg class="w-4 h-4 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-          <path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"></path>
-        </svg>
-        QUICK ACTIONS
-      </h2>
-    </div> -->
     <div class="flex justify-center space-x-4 min-w-max">
       <NuxtLink
         to="/dashboard/transaction/new"
-        class="flex flex-col items-center justify-center p-3 bg-gradient-to-b from-green-50 to-green-100 rounded-lg hover:from-green-100 hover:to-green-200 transition-colors border border-green-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-transform duration-200"
+        class="flex flex-col items-center justify-center p-3 bg-green-100 rounded-lg hover:bg-green-150 transition-colors hover: transform hover:-translate-y-0.5 transition-transform duration-200"
       >
         <div
-          class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-1 shadow-inner"
+          class="w-12 h-12 rounded-full flex items-center justify-center mb-1"
         >
           <svg
             class="w-6 h-6 text-green-600"
@@ -39,11 +31,11 @@
       </NuxtLink>
 
       <NuxtLink
-        to="/dashboard/budget/new"
-        class="flex flex-col items-center justify-center p-3 bg-gradient-to-b from-blue-50 to-blue-100 rounded-lg hover:from-blue-100 hover:to-blue-200 transition-colors border border-blue-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-transform duration-200"
+        to="/dashboard/budget"
+        class="flex flex-col items-center justify-center p-3 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors hover: transform hover:-translate-y-0.5 transition-transform duration-200"
       >
         <div
-          class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-1 shadow-inner"
+          class="w-12 h-12 rounded-full flex items-center justify-center mb-1"
         >
           <svg
             class="w-6 h-6 text-blue-600"
@@ -64,11 +56,11 @@
       </NuxtLink>
 
       <NuxtLink
-        to="/dashboard/challenges/new"
-        class="flex flex-col items-center justify-center p-3 bg-gradient-to-b from-purple-50 to-purple-100 rounded-lg hover:from-purple-100 hover:to-purple-200 transition-colors border border-purple-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5 transition-transform duration-200"
+        to="/dashboard/challenges"
+        class="flex flex-col items-center justify-center p-3 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors hover: transform hover:-translate-y-0.5 transition-transform duration-200"
       >
         <div
-          class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-1 shadow-inner"
+          class="w-12 h-12 rounded-full flex items-center justify-center mb-1"
         >
           <svg
             class="w-6 h-6 text-purple-600"

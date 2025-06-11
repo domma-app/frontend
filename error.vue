@@ -13,7 +13,7 @@
       </p>
 
       <!-- Lottie animation -->
-      <div class="my-12 h-64 w-full flex items-center justify-center">
+      <!-- <div class="my-12 h-64 w-full flex items-center justify-center">
         <Vue3Lottie
           :animation-data="animationData"
           :height="250"
@@ -21,10 +21,10 @@
           :loop="true"
           :auto-play="true"
         />
-      </div>
+      </div> -->
 
       <!-- Back to home button -->
-      <div>
+      <div class="mt-16">
         <NuxtLink
           to="/"
           class="inline-block px-8 py-3.5 text-base font-medium rounded-md text-white bg-green-500 hover:bg-green-600 transition-all"
@@ -37,8 +37,8 @@
 </template>
 
 <script setup lang="ts">
-import { Vue3Lottie } from "vue3-lottie";
-import animationData from "~/assets/lottie/404-animation.json";
+// import { Vue3Lottie } from "vue3-lottie";
+// import animationData from "~/assets/lottie/404-animation.json";
 
 defineProps({
   error: Object,

@@ -2,9 +2,7 @@
   <section
     :class="[
       'rounded-lg shadow-sm p-6',
-      highlight
-        ? 'bg-gradient-to-r from-green-50 to-blue-50 border-l-4 border-green-500'
-        : 'bg-white',
+      highlight ? 'bg-green-50 border-l-4 border-green-500' : 'bg-white',
     ]"
   >
     <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
