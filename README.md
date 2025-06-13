@@ -152,6 +152,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-For backend documentation, please refer to the [backend README](../backend/README.md).
+For backend documentation, please refer to the [backend README](https://github.com/domma-app/backend/blob/main/README.md)).
 
 For any questions or issues, please open an issue in the repository or contact the development team.
